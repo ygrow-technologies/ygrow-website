@@ -12,7 +12,7 @@
 
 
 
-YGrow is a developer career network built to help developers spend less time dealing with the operational stress of job searching and more time doing what they do best — building software, solving problems, and growing their careers.
+YGrow is a developer career network built to help developers spend less time dealing with the operational stress of job searching and more time doing what they do best - building software, solving problems, and growing their careers.
 
 
 
@@ -1914,7 +1914,7 @@ We connect community relationships to real career opportunities.
 
 
 
-YGrow is designed to help developers—not replace their judgment.
+YGrow is designed to help developers-not replace their judgment.
 
 
 
@@ -4254,7 +4254,7 @@ A developer career network helping developers connect with people, opportunities
 
 
 
-> \*\*YGrow — Why Grow Alone?\*\*
+> \*\*YGrow - Why Grow Alone?\*\*
 
 >
 

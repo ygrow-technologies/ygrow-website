@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { FormEvent, lazy, Suspense, useEffect, useRef, useState } from 'react'
 import {
   ArrowRight,
   BarChart3,
@@ -21,6 +21,8 @@ import {
   Zap,
 } from 'lucide-react'
 import { createClient } from '@supabase/supabase-js'
+
+const ParticleCloud = lazy(() => import('./components/ParticleCloud'))
 
 type Feature = {
   id: string
@@ -74,7 +76,7 @@ const journey = [
   { number: '01', title: 'Build your profile', copy: 'Capture the work you have done, the systems you have built, and where you want to go.' },
   { number: '02', title: 'Connect the right signals', copy: 'Bring opportunities, people, companies, and career preferences into one network.' },
   { number: '03', title: 'Move with confidence', copy: 'Organize your search, prepare with YGrow One, and learn from every conversation.' },
-  { number: '04', title: 'Grow—and help others grow', copy: 'Build lasting professional relationships through referrals, insight, and community.' },
+  { number: '04', title: 'Grow-and help others grow', copy: 'Build lasting professional relationships through referrals, insight, and community.' },
 ]
 
 const faqs = [
@@ -88,7 +90,7 @@ const faqs = [
   },
   {
     q: 'Who is YGrow for?',
-    a: 'YGrow is being designed for developers across their career—from first role to engineering leadership—and for the recruiters, companies, coaches, and communities that support them.',
+    a: 'YGrow is being designed for developers across their career-from first role to engineering leadership-and for the recruiters, companies, coaches, and communities that support them.',
   },
   {
     q: 'Does YGrow apply to jobs automatically?',
@@ -371,12 +373,13 @@ function App() {
       <main>
         <section className="hero-grid relative px-4 pb-28 pt-40 sm:pb-32 sm:pt-48 lg:min-h-[880px] lg:pb-40 lg:pt-52">
           <AmbientGrid />
+          <Suspense fallback={null}><ParticleCloud /></Suspense>
           <div className="orb orb-one" /><div className="orb orb-two" />
           <div className="page-wrap relative z-10 grid items-center gap-20 lg:grid-cols-[.88fr_1.12fr] lg:gap-20">
             <div className="reveal max-w-2xl">
               <div className="eyebrow"><Sparkles size={13} /> The career network built for developers</div>
               <h1 className="mt-8 font-display text-[clamp(3.7rem,7.4vw,7rem)] font-medium leading-[.91] tracking-[-.07em] text-ink">Why grow<br /><span className="text-gradient">alone?</span></h1>
-              <p className="mt-9 max-w-xl text-lg leading-8 text-slate-600 sm:text-xl">Build your professional identity, discover better opportunities, and move your career forward with the right people—and <strong className="font-semibold text-ink">YGrow One</strong>—beside you.</p>
+              <p className="mt-9 max-w-xl text-lg leading-8 text-slate-600 sm:text-xl">Build your professional identity, discover better opportunities, and move your career forward with the right people-and <strong className="font-semibold text-ink">YGrow One</strong>-beside you.</p>
               <div id="join" className="mt-11"><WaitlistForm /></div>
               <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-slate-500"><span className="flex items-center gap-1.5"><Check size={13} className="text-black/55" /> Free to join</span><span className="flex items-center gap-1.5"><Check size={13} className="text-black/55" /> Built developer-first</span><span className="flex items-center gap-1.5"><Check size={13} className="text-black/55" /> You stay in control</span></div>
             </div>
@@ -390,7 +393,7 @@ function App() {
 
         <section className="bg-white pt-24 sm:pt-28 lg:pt-36" id="platform">
           <div className="page-wrap px-4 sm:px-6">
-            <div className="reveal section-heading"><div className="eyebrow"><Command size={13} /> One connected platform</div><h2>Your career deserves<br />more than disconnected tools.</h2><p>Scroll through one connected journey—from the story you have built to the opportunity ahead.</p></div>
+            <div className="reveal section-heading"><div className="eyebrow"><Command size={13} /> One connected platform</div><h2>Your career deserves<br />more than disconnected tools.</h2><p>Scroll through one connected journey-from the story you have built to the opportunity ahead.</p></div>
           </div>
 
           <div ref={platformStageRef} className="platform-pin-stage mt-8 hidden lg:block" style={{ height: `${features.length * 100}vh` }}>
@@ -445,7 +448,7 @@ function App() {
           <div className="absolute inset-0 one-grid opacity-20" />
           <AmbientGrid dark />
           <div className="page-wrap relative z-10 grid items-center gap-14 lg:grid-cols-2">
-            <div className="reveal"><div className="eyebrow eyebrow-dark"><Sparkles size={13} /> Meet YGrow One</div><h2 className="mt-7 font-display text-4xl font-medium leading-[1.03] tracking-[-.045em] sm:text-6xl">The context you need,<br /><span className="text-sky">right when it matters.</span></h2><p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">YGrow One connects the opportunity in front of you with the experience behind you—so preparation feels relevant, interviews feel calmer, and each result sharpens the next move.</p><div className="mt-8 grid gap-4 sm:grid-cols-2">{[['Grounded, not generic', 'Uses your real projects, skills, and responsibilities.'], ['Always connected', 'Works alongside your profile, pipeline, and interview history.'], ['Built to assist', 'Surfaces useful context while your judgment stays in control.'], ['Learns with you', 'Turns interview notes and outcomes into future insight.']].map(([title, copy]) => <div key={title} className="flex gap-3"><CircleCheck size={18} className="mt-0.5 shrink-0 text-sky" /><div><p className="text-sm font-semibold">{title}</p><p className="mt-1 text-xs leading-5 text-slate-400">{copy}</p></div></div>)}</div></div>
+            <div className="reveal"><div className="eyebrow eyebrow-dark"><Sparkles size={13} /> Meet YGrow One</div><h2 className="mt-7 font-display text-4xl font-medium leading-[1.03] tracking-[-.045em] sm:text-6xl">The context you need,<br /><span className="text-sky">right when it matters.</span></h2><p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">YGrow One connects the opportunity in front of you with the experience behind you-so preparation feels relevant, interviews feel calmer, and each result sharpens the next move.</p><div className="mt-8 grid gap-4 sm:grid-cols-2">{[['Grounded, not generic', 'Uses your real projects, skills, and responsibilities.'], ['Always connected', 'Works alongside your profile, pipeline, and interview history.'], ['Built to assist', 'Surfaces useful context while your judgment stays in control.'], ['Learns with you', 'Turns interview notes and outcomes into future insight.']].map(([title, copy]) => <div key={title} className="flex gap-3"><CircleCheck size={18} className="mt-0.5 shrink-0 text-sky" /><div><p className="text-sm font-semibold">{title}</p><p className="mt-1 text-xs leading-5 text-slate-400">{copy}</p></div></div>)}</div></div>
             <div className="reveal reveal-right reveal-delay-1 relative"><div className="absolute inset-10 rounded-full bg-white/10 blur-[90px]" /><div className="relative rounded-[20px] border border-white/15 bg-white/[.055] p-5 backdrop-blur sm:p-7"><div className="flex items-center justify-between border-b border-white/10 pb-5"><div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-xl bg-white text-ink"><Sparkles size={20} /></span><div><p className="font-display font-bold">YGrow One</p><p className="text-xs text-slate-400">Interview companion</p></div></div><span className="flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-[9px] font-bold text-white/70"><i className="h-1.5 w-1.5 rounded-full bg-white" /> CONTEXT READY</span></div><div className="my-5 flex gap-3 rounded-xl bg-black/35 p-4"><MessageSquareText size={17} className="mt-0.5 shrink-0 text-white/80" /><p className="text-sm leading-6 text-slate-200">Tell me about a technical decision you changed after receiving feedback.</p></div><div className="space-y-3">{[['Best example', 'The observability rollout at Orbit'], ['Why it fits', 'Shows technical judgment + cross-team collaboration'], ['Key result', 'Alert noise reduced 46% in six weeks']].map(([label, value]) => <div key={label} className="rounded-xl border border-white/10 bg-white/[.04] p-3.5"><p className="text-[9px] font-bold uppercase tracking-[.15em] text-slate-500">{label}</p><p className="mt-1.5 text-sm text-slate-200">{value}</p></div>)}</div><div className="mt-5 flex items-center gap-2 text-[10px] text-slate-500"><ShieldCheck size={13} className="text-white/70" /> Built around your context. You stay in control.</div></div></div>
           </div>
         </section>
