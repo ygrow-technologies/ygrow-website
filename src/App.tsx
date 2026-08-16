@@ -432,13 +432,21 @@ function App() {
           </div>
         </section>
 
-        <section className="section-space bg-[#f2f2ef]" id="journey">
-          <div className="page-wrap">
+        <section className="journey-section section-space" id="journey">
+          <div className="journey-grid" aria-hidden="true" />
+          <div className="journey-glow journey-glow-left" aria-hidden="true" />
+          <div className="journey-glow journey-glow-right" aria-hidden="true" />
+          <div className="page-wrap relative z-10">
             <div className="grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:gap-20">
               <div className="reveal lg:sticky lg:top-32 lg:self-start"><div className="eyebrow"><Zap size={13} /> A better career rhythm</div><h2 className="section-title mt-6">From ambition<br />to momentum.</h2><p className="section-copy mt-5">Career growth is not a transaction. It is a connected loop that gets stronger with better context, clearer signals, and the right relationships.</p><a href="#join" className="button-secondary mt-8">Start your journey <ArrowRight size={15} /></a></div>
-              <div className="relative">
-                <div className="absolute bottom-10 left-[23px] top-10 w-px bg-gradient-to-b from-black/40 via-black/10 to-transparent sm:left-[35px]" />
-                {journey.map((item, index) => <div key={item.number} style={{ transitionDelay: `${index * 80}ms` }} className="reveal relative mb-4 grid grid-cols-[48px_1fr] gap-4 rounded-[18px] border border-black/10 bg-white p-5 sm:grid-cols-[70px_1fr] sm:p-7"><span className="relative z-10 grid h-12 w-12 place-items-center rounded-lg bg-ink font-display text-xs font-semibold text-white sm:h-14 sm:w-14">{item.number}</span><div><div className="mb-3 flex items-center gap-3"><h3 className="font-display text-xl font-semibold text-ink">{item.title}</h3>{index === 3 && <Sparkles size={16} className="text-black/60" />}</div><p className="max-w-xl text-sm leading-6 text-slate-500 sm:text-base sm:leading-7">{item.copy}</p></div></div>)}
+              <div className="journey-stack relative">
+                <div className="journey-rail" aria-hidden="true" />
+                {journey.map((item, index) => <div key={item.number} style={{ transitionDelay: `${index * 80}ms` }} className="reveal journey-card-wrap">
+                  <article className={`journey-card journey-card-${index + 1} ${index === 0 ? 'journey-card-featured' : ''}`}>
+                    <span className="journey-number">{item.number}</span>
+                    <div className="relative z-10"><div className="mb-3 flex items-center gap-3"><h3 className="font-display text-xl font-semibold text-ink">{item.title}</h3>{index === 3 && <Sparkles size={16} className="text-black/60" />}</div><p className="max-w-xl text-sm leading-6 text-slate-500 sm:text-base sm:leading-7">{item.copy}</p></div>
+                  </article>
+                </div>)}
               </div>
             </div>
           </div>
