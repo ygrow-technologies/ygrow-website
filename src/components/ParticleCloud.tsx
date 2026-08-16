@@ -158,13 +158,13 @@ export default function ParticleCloud() {
     const isSmall = window.innerWidth < 768
     const definitions: Array<{ count: number; opacity: number; shape: ParticleShape; size: number }> = [
       { count: isSmall ? 960 : 1920, opacity: 1, shape: 'circle', size: 0.065 },
-      { count: isSmall ? 900 : 800, opacity: 1, shape: 'square', size: 0.052 },
+      { count: isSmall ? 900 : 1800, opacity: 1, shape: 'square', size: 0.052 },
       { count: isSmall ? 580 : 160, opacity: 1, shape: 'bar', size: 0.068 },
     ]
 
     const textures: CanvasTexture[] = []
     const groups: ParticleGroup[] = []
-    const radius = 2.2
+    const radius = 3
 
     const resetParticle = (
       route: Float32Array,
@@ -413,7 +413,7 @@ export default function ParticleCloud() {
       renderer.setSize(width, height, false)
       camera.aspect = width / height
       camera.updateProjectionMatrix()
-      cloudOffsetX = width >= 1024 ? -1.7 : -0.25
+      cloudOffsetX = width >= 1024 ? 0.4 : 0
       groups.forEach((group) => {
         group.points.position.x = cloudOffsetX
         group.material.uniforms.uPixelRatio.value = renderer.getPixelRatio()
