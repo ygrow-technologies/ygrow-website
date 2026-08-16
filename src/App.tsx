@@ -127,6 +127,21 @@ function AmbientGrid({ dark = false }: { dark?: boolean }) {
   )
 }
 
+function SectionPattern({ variant }: { variant: 'teams' | 'faq' }) {
+  return (
+    <div className={`section-pattern section-pattern-${variant}`} aria-hidden="true">
+      <span className="section-pattern-grid section-pattern-grid-1" />
+      <span className="section-pattern-grid section-pattern-grid-2" />
+      <span className="section-pattern-grid section-pattern-grid-3" />
+      <span className="section-pattern-dots" />
+      <span className="section-pattern-line section-pattern-line-h1" />
+      <span className="section-pattern-line section-pattern-line-h2" />
+      <span className="section-pattern-line section-pattern-line-v1" />
+      <span className="section-pattern-line section-pattern-line-v2" />
+    </div>
+  )
+}
+
 function DashboardPreview() {
   const [active, setActive] = useState(0)
   const roles = [
@@ -461,20 +476,43 @@ function App() {
           </div>
         </section>
 
-        <section id="teams" className="section-space">
-          <div className="page-wrap"><div className="reveal section-heading"><div className="eyebrow"><Users size={13} /> Grow together</div><h2>A stronger network creates<br />better opportunities.</h2><p>YGrow is designed to make every side of the developer career ecosystem more human, relevant, and connected.</p></div><div className="mt-14 grid gap-5 md:grid-cols-3">{[
+        <section id="teams" className="pattern-section pattern-section-teams section-space">
+          <SectionPattern variant="teams" />
+          <div className="page-wrap relative z-10"><div className="reveal section-heading"><div className="eyebrow"><Users size={13} /> Grow together</div><h2>A stronger network creates<br />better opportunities.</h2><p>YGrow is designed to make every side of the developer career ecosystem more human, relevant, and connected.</p></div><div className="mt-14 grid gap-5 md:grid-cols-3">{[
             { icon: Code2, tag: 'For developers', title: 'Build a career, not just a job search.', copy: 'Create a richer professional identity, connect with people who matter, and navigate each opportunity with clarity.', points: ['Career profile', 'Network & referrals', 'Opportunity workspace'] },
             { icon: Search, tag: 'For talent teams', title: 'Discover context beyond keywords.', copy: 'Understand the developer behind the résumé and build stronger candidate relationships from the first conversation.', points: ['Developer discovery', 'Context-rich matching', 'Connected outreach'] },
             { icon: Network, tag: 'For communities', title: 'Turn support into shared momentum.', copy: 'Help members move from learning to opportunity with better profiles, mentorship, and professional connections.', points: ['Member growth', 'Mentorship pathways', 'Career intelligence'] },
           ].map((card, i) => { const Icon = card.icon; return <article key={card.tag} style={{ transitionDelay: `${i * 100}ms` }} className={`reveal group rounded-[18px] border p-8 transition duration-300 hover:-translate-y-1 ${i === 1 ? 'border-ink bg-ink text-white' : 'border-black/10 bg-white'}`}><span className={`grid h-12 w-12 place-items-center rounded-lg ${i === 1 ? 'bg-white/10 text-white' : 'bg-neutral-100 text-black'}`}><Icon size={21} /></span><p className={`mt-8 text-[10px] font-semibold uppercase tracking-[.17em] ${i === 1 ? 'text-white/60' : 'text-black/55'}`}>{card.tag}</p><h3 className="mt-3 font-display text-2xl font-medium leading-tight">{card.title}</h3><p className={`mt-4 text-sm leading-6 ${i === 1 ? 'text-slate-300' : 'text-slate-500'}`}>{card.copy}</p><div className={`my-7 h-px ${i === 1 ? 'bg-white/10' : 'bg-black/[.07]'}`} />{card.points.map(point => <p key={point} className="mb-3 flex items-center gap-2 text-sm font-medium"><Check size={14} className={i === 1 ? 'text-white/70' : 'text-black/55'} />{point}</p>)}</article> })}</div></div>
         </section>
 
-        <section id="faq" className="section-space bg-[#f2f2ef]">
-          <div className="page-wrap grid gap-12 lg:grid-cols-[.65fr_1.35fr] lg:gap-20"><div className="reveal"><div className="eyebrow"><MessageSquareText size={13} /> Questions, answered</div><h2 className="section-title mt-6">Good to know.</h2><p className="section-copy mt-5">Have something else in mind? Reach us at <a className="font-semibold text-ink underline decoration-black/40 underline-offset-4" href="mailto:hello@ygrow.com">hello@ygrow.com</a>.</p></div><div className="reveal reveal-right divide-y divide-slate-200">{faqs.map((faq, index) => <div key={faq.q}><button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} className="flex w-full items-center justify-between gap-5 py-6 text-left"><span className="font-display text-lg font-bold text-ink">{faq.q}</span><span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border border-slate-200 transition ${openFaq === index ? 'rotate-180 bg-ink text-white' : 'bg-white'}`}><ChevronDown size={15} /></span></button><div className={`grid transition-[grid-template-rows] duration-300 ${openFaq === index ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}><div className="overflow-hidden"><p className="max-w-2xl pb-6 pr-12 text-sm leading-7 text-slate-500 sm:text-base">{faq.a}</p></div></div></div>)}</div></div>
+        <section id="faq" className="pattern-section pattern-section-faq section-space">
+          <SectionPattern variant="faq" />
+          <div className="page-wrap relative z-10 grid gap-12 lg:grid-cols-[.65fr_1.35fr] lg:gap-20"><div className="reveal"><div className="eyebrow"><MessageSquareText size={13} /> Questions, answered</div><h2 className="section-title mt-6">Good to know.</h2><p className="section-copy mt-5">Have something else in mind? Reach us at <a className="font-semibold text-ink underline decoration-black/40 underline-offset-4" href="mailto:hello@ygrow.com">hello@ygrow.com</a>.</p></div><div className="reveal reveal-right divide-y divide-slate-200">{faqs.map((faq, index) => <div key={faq.q}><button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} className="flex w-full items-center justify-between gap-5 py-6 text-left"><span className="font-display text-lg font-bold text-ink">{faq.q}</span><span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border border-slate-200 transition ${openFaq === index ? 'rotate-180 bg-ink text-white' : 'bg-white'}`}><ChevronDown size={15} /></span></button><div className={`grid transition-[grid-template-rows] duration-300 ${openFaq === index ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}><div className="overflow-hidden"><p className="max-w-2xl pb-6 pr-12 text-sm leading-7 text-slate-500 sm:text-base">{faq.a}</p></div></div></div>)}</div></div>
         </section>
 
-        <section className="px-4 py-6 sm:px-6">
-          <div className="reveal cta-panel page-wrap relative overflow-hidden rounded-[18px] bg-ink px-6 py-16 text-center text-white sm:px-10 sm:py-20"><div className="absolute left-[-5%] top-[-30%] h-80 w-80 rounded-full bg-white/10 blur-[90px]" /><div className="absolute bottom-[-40%] right-[-5%] h-80 w-80 rounded-full bg-white/[.06] blur-[90px]" /><div className="relative mx-auto max-w-3xl"><div className="mx-auto mb-6 grid h-14 w-14 place-items-center rounded-lg border border-white/15 bg-white/[.06] text-white"><Sparkles size={23} /></div><h2 className="font-display text-4xl font-medium tracking-[-.045em] sm:text-6xl">Your career is yours.<br /><span className="text-white/60">The path can be shared.</span></h2><p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">Join the developer network built to turn profiles, people, opportunities, and context into lasting career momentum.</p><div className="mx-auto mt-9 max-w-xl"><WaitlistForm compact /></div></div></div>
+        <section className="join-section">
+          <div className="join-grid-fragment join-grid-a" aria-hidden="true" />
+          <div className="join-grid-fragment join-grid-b" aria-hidden="true" />
+          <div className="join-grid-fragment join-grid-c" aria-hidden="true" />
+          <div className="join-grid-fragment join-grid-d" aria-hidden="true" />
+          <div className="join-grid-fragment join-grid-e" aria-hidden="true" />
+          <div className="join-grid-fragment join-grid-f" aria-hidden="true" />
+          <div className="join-grid-fragment join-grid-g" aria-hidden="true" />
+          <div className="join-grid-fragment join-grid-h" aria-hidden="true" />
+          <div className="join-guides" aria-hidden="true">
+            <span className="join-guide join-guide-h1" /><span className="join-guide join-guide-h2" /><span className="join-guide join-guide-h3" /><span className="join-guide join-guide-h4" />
+            <span className="join-guide join-guide-v1" /><span className="join-guide join-guide-v2" /><span className="join-guide join-guide-v3" /><span className="join-guide join-guide-v4" />
+          </div>
+          <div className="join-dots join-dots-top" aria-hidden="true" />
+          <div className="join-dots join-dots-bottom" aria-hidden="true" />
+          <div className="page-wrap relative z-10">
+            <div className="reveal max-w-3xl">
+              <div className="eyebrow"><Sparkles size={13} /> A developer network</div>
+              <h2 className="mt-7 font-display text-4xl font-medium leading-[1.03] tracking-[-.05em] text-ink sm:text-6xl lg:text-7xl">Your career is yours.<br /><span className="text-slate-500">The path can be shared.</span></h2>
+              <p className="mt-7 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">Join the developer network built to turn profiles, people, opportunities, and context into lasting career momentum.</p>
+              <div className="join-form mt-9 max-w-xl"><WaitlistForm compact /></div>
+            </div>
+          </div>
         </section>
       </main>
 
