@@ -346,7 +346,7 @@ export default function ParticleCloud() {
         fragmentShader: particleFragmentShader,
         transparent: true,
         uniforms: {
-          uColor: { value: new Color(0x000) },
+          uColor: { value: new Color(0x0a1433) },
           uMap: { value: texture },
           uPixelRatio: { value: renderer.getPixelRatio() },
           uReveal: { value: reducedMotion ? 1 : 0 },
