@@ -452,12 +452,13 @@ function App() {
       </header>
 
       <main>
-        <section className="hero-grid relative flex min-h-[100svh] items-center px-4 pb-20 pt-28 sm:pb-24 sm:pt-32">
+        <section className="hero-stage relative flex min-h-[100svh] items-center px-4 pb-20 pt-28 sm:pb-24 sm:pt-32">
           <div className="page-wrap relative z-10">
-            <div className="reveal max-w-3xl text-left">
-              <HeroMessage />
-              <div id="join" className="mt-10 max-w-xl"><WaitlistForm /></div>
-              <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-white/65"><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> Free to join</span><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> Built developer-first</span><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> You stay in control</span></div>
+            <div className="reveal text-left">
+              <HeroMessage>
+                <div id="join" className="mt-10 max-w-xl"><WaitlistForm /></div>
+                <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-white/65"><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> Free to join</span><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> Built developer-first</span><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> You stay in control</span></div>
+              </HeroMessage>
             </div>
           </div>
         </section>
