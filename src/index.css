@@ -244,19 +244,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .dashboard-shell { perspective: 1100px; transform: rotateY(-2deg) rotateX(1deg); }
 .dashboard-shell > div:last-child { transform-origin: center; }
 
-.logo-crop {
-  position: relative;
-  display: inline-block;
-  width: 35px;
-  height: 35px;
-  overflow: hidden;
-  border-radius: 10px;
-  background: var(--brand-navy);
-  box-shadow: 0 7px 18px rgba(10,20,51,.18);
-}
-.logo-crop img { position: absolute; width: 75px; max-width: none; left: -1px; top: -16px; filter: contrast(1.08) saturate(1.12); }
-.logo-crop-light { box-shadow: none; border: 1px solid rgba(255,255,255,.12); }
-
 .context-diagram {
   position: relative;
   width: 100%;

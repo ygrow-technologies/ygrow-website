@@ -18,6 +18,8 @@ import {
   X,
 } from 'lucide-react'
 import { createClient } from '@supabase/supabase-js'
+import logoDark from './assets/logo-dark.png'
+import logoLight from './assets/logo-light.png'
 import CareerOrbit from './components/CareerOrbit'
 import ContextDiagram from './components/ContextDiagram'
 import HeroMessage from './components/HeroMessage'
@@ -108,11 +110,9 @@ const faqs = [
 function BrandMark({ light = false }: { light?: boolean }) {
   return (
     <a href="#top" className="group flex items-center gap-2.5" aria-label="YGrow home">
-      <span className={`logo-crop ${light ? 'logo-crop-light' : ''}`}>
-        <img src="/brand/logo.png" alt="" aria-hidden="true" />
-      </span>
-      <span className={` text-[1.35rem] font-extrabold tracking-[-0.05em] ${light ? 'text-white' : 'text-ink'}`}>
-        YGrow
+      <img src={light ? logoLight : logoDark} alt="" aria-hidden="true" className="h-10 w-10 shrink-0 object-contain sm:h-11 sm:w-11" />
+      <span className={`text-[1.35rem] font-extrabold tracking-[-0.05em] ${light ? 'text-white' : 'text-ink'}`}>
+        Grow
       </span>
     </a>
   )
