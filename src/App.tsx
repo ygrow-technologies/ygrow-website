@@ -10,10 +10,8 @@ import {
   Command,
   Compass,
   Menu,
-  MessageSquareText,
   Network,
   Search,
-  ShieldCheck,
   Sparkles,
   Target,
   Users,
@@ -21,6 +19,8 @@ import {
 } from 'lucide-react'
 import { createClient } from '@supabase/supabase-js'
 import CareerOrbit from './components/CareerOrbit'
+import ContextDiagram from './components/ContextDiagram'
+import HeroMessage from './components/HeroMessage'
 
 type Feature = {
   id: string
@@ -75,14 +75,6 @@ const features: Feature[] = [
   },
 ]
 
-const heroTopics = [
-  { lines: ['GROW', 'TOGETHER'], animation: 'slide' },
-  { lines: ['BUILD', 'YOUR STORY'], animation: 'flicker' },
-  { lines: ['FIND', 'YOUR FIT'], animation: 'focus' },
-  { lines: ['MOVE', 'FORWARD'], animation: 'type' },
-  { lines: ['RISE', 'TOGETHER'], animation: 'split' },
-]
-
 const journey = [
   { number: '01', title: 'Build your profile', copy: 'Capture the work you have done, the systems you have built, and where you want to go.' },
   { number: '02', title: 'Connect the right signals', copy: 'Bring opportunities, people, companies, and career preferences into one network.' },
@@ -126,29 +118,15 @@ function BrandMark({ light = false }: { light?: boolean }) {
   )
 }
 
-function AmbientGrid({ dark = false }: { dark?: boolean }) {
+function BackgroundFlow({ dark = false, variant = 'platform' }: { dark?: boolean; variant?: 'platform' | 'journey' | 'one' | 'teams' | 'faq' }) {
   return (
-    <div className={`ambient-grid ${dark ? 'ambient-grid-dark' : ''}`} aria-hidden="true">
-      <span className="grid-line grid-line-v grid-line-1"><i /></span>
-      <span className="grid-line grid-line-h grid-line-2"><i /></span>
-      <span className="grid-line grid-line-v grid-line-3"><i /></span>
-      <span className="grid-line grid-line-h grid-line-4"><i /></span>
-      <span className="grid-line grid-line-v grid-line-5"><i /></span>
-    </div>
-  )
-}
-
-function SectionPattern({ variant }: { variant: 'teams' | 'faq' }) {
-  return (
-    <div className={`section-pattern section-pattern-${variant}`} aria-hidden="true">
-      <span className="section-pattern-grid section-pattern-grid-1" />
-      <span className="section-pattern-grid section-pattern-grid-2" />
-      <span className="section-pattern-grid section-pattern-grid-3" />
-      <span className="section-pattern-dots" />
-      <span className="section-pattern-line section-pattern-line-h1" />
-      <span className="section-pattern-line section-pattern-line-h2" />
-      <span className="section-pattern-line section-pattern-line-v1" />
-      <span className="section-pattern-line section-pattern-line-v2" />
+    <div className={`background-flow background-flow-${variant} ${dark ? 'background-flow-dark' : ''}`} aria-hidden="true">
+      <span className="background-orb background-orb-coral" />
+      <span className="background-orb background-orb-teal" />
+      <span className="background-orb background-orb-blue" />
+      <span className="background-line background-line-1"><i /></span>
+      <span className="background-line background-line-2"><i /></span>
+      <span className="background-line background-line-3"><i /></span>
     </div>
   )
 }
@@ -263,9 +241,9 @@ export function DashboardPreview() {
               [Command, 'Overview'], [Compass, 'Discover'], [BriefcaseBusiness, 'Pipeline'],
               [Users, 'Network'], [Sparkles, 'YGrow One'], [BarChart3, 'Insights'],
             ].map(([Icon, label], index) => (
-              <button key={label as string} className={`mb-1 flex w-full items-center gap-2 rounded-lg p-2 text-left text-[10px] font-semibold transition ${index === 0 ? 'bg-ink text-white' : 'text-slate-500 hover:bg-slate-50'}`}>
+              <div key={label as string} className={`mb-1 flex w-full items-center gap-2 rounded-lg p-2 text-left text-[10px] font-semibold ${index === 0 ? 'bg-ink text-white' : 'text-slate-500'}`}>
                 <Icon size={13} /><span className="hidden sm:inline">{label as string}</span>
-              </button>
+              </div>
             ))}
           </aside>
           <main className="min-w-0 p-4 sm:p-5">
@@ -285,7 +263,7 @@ export function DashboardPreview() {
                 <div className="mb-3 flex items-center justify-between"><p className="text-[10px] font-bold text-ink">Best-fit opportunities</p><span className="text-[8px] font-bold text-brand-blue">View all</span></div>
                 <div className="space-y-2">
                   {roles.map((item, index) => (
-                    <button onClick={() => setActive(index)} key={item.company} className={`flex w-full items-center gap-2.5 rounded-xl border p-2.5 text-left transition ${active === index ? 'border-brand-blue/35 bg-brand-blue/5' : 'border-transparent bg-slate-50/70 hover:bg-slate-50'}`}>
+                    <button type="button" onClick={() => setActive(index)} key={item.company} className={`flex w-full items-center gap-2.5 rounded-xl border p-2.5 text-left transition ${active === index ? 'border-brand-blue/35 bg-brand-blue/5' : 'border-transparent bg-slate-50/70 hover:bg-slate-50'}`} aria-pressed={active === index}>
                       <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${item.color} text-[10px] font-bold text-white`}>{item.company[0]}</span>
                       <span className="min-w-0 flex-1"><b className="block truncate text-[9px] text-ink">{item.role}</b><small className="text-[8px] text-slate-400">{item.company} · Remote</small></span>
                       <span className="text-[9px] font-bold text-brand-blue">{item.fit}%</span>
@@ -297,7 +275,7 @@ export function DashboardPreview() {
                 <div className="rounded-2xl bg-ink p-4 text-white">
                   <div className="mb-4 flex items-start justify-between"><span className="grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-white"><Sparkles size={15} /></span><span className="rounded-full bg-white/10 px-2 py-1 text-[7px] font-bold text-white/75">READY</span></div>
                   <p className="text-[9px] font-bold">Technical interview</p><p className="mt-1 text-[8px] text-slate-400">Today · 2:30 PM</p>
-                  <button className="mt-4 flex w-full items-center justify-center gap-1 rounded-lg bg-white py-2 text-[8px] font-bold text-ink">Open preparation <ArrowRight size={10} /></button>
+                  <div className="mt-4 flex w-full items-center justify-center gap-1 rounded-lg bg-white py-2 text-[8px] font-bold text-ink">Preparation ready <ArrowRight size={10} /></div>
                 </div>
                 <div className="rounded-2xl border border-slate-100 bg-white p-3.5">
                   <div className="flex items-end justify-between"><div><p className="text-[8px] text-slate-400">Career momentum</p><p className="mt-1 text-sm font-bold text-ink">+24%</p></div><BarChart3 size={18} className="text-brand-teal" /></div>
@@ -355,41 +333,43 @@ function OneCard() {
   return <div className="mt-10 rounded-3xl border border-white/10 bg-white/[.06] p-5"><div className="flex items-center gap-3"><span className="product-accent-solid relative grid h-10 w-10 place-items-center rounded-xl"><Sparkles size={18} /><i className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-ink bg-white" /></span><div><p className="font-bold">YGrow One</p><p className="text-[10px] text-slate-400">Context ready · Northstar interview</p></div></div><div className="my-5 rounded-2xl bg-brand-navy/50 p-4"><p className="text-xs leading-5 text-slate-300">“Walk me through a time you improved system reliability.”</p></div><div className="product-accent-card rounded-2xl border p-4"><p className="product-accent-text mb-2 text-[9px] font-bold uppercase tracking-[.16em]">From your experience</p><p className="text-xs leading-5 text-slate-200">Use the Atlas migration: you led the rollout across 14 services and reduced deploy failures by 38%.</p><div className="mt-3 flex items-center gap-2 text-[9px] text-slate-400"><CircleCheck size={12} className="product-accent-text" /> Grounded in your profile</div></div></div>
 }
 
-function WaitlistForm({ compact = false }: { compact?: boolean }) {
+function WaitlistForm() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
 
   async function subscribe(event: FormEvent) {
     event.preventDefault()
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
+    const normalizedEmail = email.trim().toLowerCase()
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
       setStatus('error'); setMessage('Please enter a valid email address.'); return
     }
     setStatus('loading')
+    setMessage('')
     try {
       const url = import.meta.env.VITE_SUPABASE_URL
       const key = import.meta.env.VITE_SUPABASE_ANON_KEY
-      if (url && key) {
-        const supabase = createClient(url, key)
-        const { error } = await supabase.from('waitlist').insert({ email, source: 'website' })
-        if (error && error.code !== '23505') throw error
-      } else {
-        const saved = JSON.parse(localStorage.getItem('ygrow_waitlist') || '[]') as string[]
-        localStorage.setItem('ygrow_waitlist', JSON.stringify([...new Set([...saved, email])]))
-      }
-      setStatus('success'); setMessage("You're on the list. We'll be in touch."); setEmail('')
+      if (!url || !key) throw new Error('Waitlist service is not configured')
+
+      const supabase = createClient(url, key)
+      const { error } = await supabase.from('waitlist').insert({ email: normalizedEmail, source: 'website' })
+      if (error && error.code !== '23505') throw error
+
+      setStatus('success')
+      setMessage(error?.code === '23505' ? "You're already on the list." : "You're on the list. We'll be in touch.")
+      setEmail('')
     } catch {
-      setStatus('error'); setMessage('Something went wrong. Please try again.')
+      setStatus('error'); setMessage('Signup is temporarily unavailable. Please email hello@ygrow.com.')
     }
   }
 
   return <div>
-    <form onSubmit={subscribe} className={`flex ${compact ? 'max-w-lg' : 'max-w-xl'} flex-col gap-2 sm:flex-row`}>
-      <label className="sr-only" htmlFor={`email-${compact ? 'footer' : 'hero'}`}>Work email</label>
-      <input id={`email-${compact ? 'footer' : 'hero'}`} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" className="min-h-12 min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-5 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/15" />
-      <button disabled={status === 'loading'} className="button-primary min-h-12 justify-center disabled:opacity-60">{status === 'loading' ? 'Joining…' : 'Join early access'} <ArrowRight size={16} /></button>
+    <form onSubmit={subscribe} className="flex max-w-xl flex-col gap-2 sm:flex-row" aria-busy={status === 'loading'}>
+      <label className="sr-only" htmlFor="email-hero">Work email</label>
+      <input id="email-hero" name="email" type="email" inputMode="email" autoComplete="email" required disabled={status === 'loading'} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" aria-describedby="waitlist-status" className="min-h-12 min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-5 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/15 disabled:cursor-wait disabled:opacity-70" />
+      <button type="submit" disabled={status === 'loading'} className="button-primary min-h-12 justify-center disabled:cursor-wait disabled:opacity-60">{status === 'loading' ? 'Joining…' : 'Join early access'} <ArrowRight size={16} /></button>
     </form>
-    {message && <p className={`mt-2 pl-3 text-xs ${status === 'success' ? 'text-brand-teal' : 'text-brand-coral'}`} role="status">{message}</p>}
+    {message && <p id="waitlist-status" className={`mt-2 pl-3 text-xs ${status === 'success' ? 'text-brand-teal' : 'text-brand-coral'}`} role="status" aria-live="polite">{message}</p>}
   </div>
 }
 
@@ -398,7 +378,6 @@ function App() {
   const [activeFeature, setActiveFeature] = useState(0)
   const [openFaq, setOpenFaq] = useState(0)
   const [scrolled, setScrolled] = useState(false)
-  const [heroTopic, setHeroTopic] = useState(0)
   const [platformProgress, setPlatformProgress] = useState(0)
   const platformStageRef = useRef<HTMLDivElement>(null)
 
@@ -406,14 +385,6 @@ function App() {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const interval = window.setInterval(() => {
-      setHeroTopic((current) => (current + 1) % heroTopics.length)
-    }, 3600)
-    return () => window.clearInterval(interval)
   }, [])
 
   useEffect(() => {
@@ -474,32 +445,17 @@ function App() {
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary navigation">
             {[['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one'], ['For teams', '#teams'], ['FAQ', '#faq']].map(([label, href]) => <a key={label} href={href} className={`text-sm font-semibold transition ${scrolled ? 'text-slate-600 hover:text-ink' : 'text-white/75 hover:text-white'}`}>{label}</a>)}
           </nav>
-          <div className="hidden items-center gap-3 lg:flex"><a href="#faq" className={`px-3 text-sm font-semibold transition ${scrolled ? 'text-slate-600 hover:text-ink' : 'text-white/75 hover:text-white'}`}>Sign in</a><a href="#join" className={`button-primary ${scrolled ? '' : 'button-primary-on-dark'}`}>Join YGrow <ArrowRight size={15} /></a></div>
-          <button onClick={() => setMenuOpen(!menuOpen)} className={`grid h-10 w-10 place-items-center rounded-full border transition lg:hidden ${scrolled ? 'border-slate-200 text-ink' : 'border-white/25 text-white'}`} aria-label="Toggle navigation">{menuOpen ? <X size={18} /> : <Menu size={19} />}</button>
+          <div className="hidden items-center lg:flex"><a href="#join" className={`button-primary ${scrolled ? '' : 'button-primary-on-dark'}`}>Join YGrow <ArrowRight size={15} /></a></div>
+          <button type="button" onClick={() => setMenuOpen(!menuOpen)} className={`grid h-10 w-10 place-items-center rounded-full border transition lg:hidden ${scrolled ? 'border-slate-200 text-ink' : 'border-white/25 text-white'}`} aria-label="Toggle navigation" aria-expanded={menuOpen} aria-controls="mobile-navigation">{menuOpen ? <X size={18} /> : <Menu size={19} />}</button>
         </div>
-        {menuOpen && <div className="mx-4 mt-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-card lg:hidden">{[['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one'], ['For teams', '#teams'], ['FAQ', '#faq']].map(([label, href]) => <a onClick={() => setMenuOpen(false)} key={label} href={href} className="block rounded-xl px-3 py-3 text-sm font-semibold hover:bg-slate-50">{label}</a>)}<a href="#join" onClick={() => setMenuOpen(false)} className="button-primary mt-3 justify-center">Join early access <ArrowRight size={15} /></a></div>}
+        {menuOpen && <div id="mobile-navigation" className="mx-4 mt-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-card lg:hidden">{[['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one'], ['For teams', '#teams'], ['FAQ', '#faq']].map(([label, href]) => <a onClick={() => setMenuOpen(false)} key={label} href={href} className="block rounded-xl px-3 py-3 text-sm font-semibold hover:bg-slate-50">{label}</a>)}<a href="#join" onClick={() => setMenuOpen(false)} className="button-primary mt-3 justify-center">Join early access <ArrowRight size={15} /></a></div>}
       </header>
 
       <main>
         <section className="hero-grid relative flex min-h-[100svh] items-center px-4 pb-20 pt-28 sm:pb-24 sm:pt-32">
           <div className="page-wrap relative z-10">
             <div className="reveal max-w-3xl text-left">
-              <h1
-                key={heroTopic}
-                aria-label={heroTopics[heroTopic].lines.join(' ')}
-                className={`hero-topic-heading hero-topic-${heroTopics[heroTopic].animation} text-[clamp(3.7rem,9vw,7.5rem)] font-medium leading-[.9] tracking-[-.04em] text-white`}
-              >
-                {heroTopics[heroTopic].animation === 'type'
-                  ? heroTopics[heroTopic].lines.map((line, lineIndex) => {
-                    const delayOffset = lineIndex === 0 ? 0 : heroTopics[heroTopic].lines[0].length * 65 + 140
-                    return <span key={line} className="hero-topic-line hero-type-line" aria-hidden="true">
-                      {Array.from(line).map((letter, letterIndex) => <span key={`${letter}-${letterIndex}`} className="hero-type-letter" style={{ animationDelay: `${delayOffset + letterIndex * 65}ms` }}>{letter === ' ' ? '\u00a0' : letter}</span>)}
-                      {lineIndex === 1 && <span className="hero-type-cursor" />}
-                    </span>
-                  })
-                  : heroTopics[heroTopic].lines.map((line, lineIndex) => <span key={line} className={`hero-topic-line ${lineIndex === 1 ? 'hero-topic-line-delay' : ''}`} aria-hidden="true">{line}</span>)}
-              </h1>
-              <p className="mt-8 max-w-2xl text-lg leading-8 text-white/75 sm:text-xl">Build your professional identity, discover better opportunities, and move your career forward with the right people-and <strong className="font-semibold text-white">YGrow One</strong>-beside you.</p>
+              <HeroMessage />
               <div id="join" className="mt-10 max-w-xl"><WaitlistForm /></div>
               <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-white/65"><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> Free to join</span><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> Built developer-first</span><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> You stay in control</span></div>
             </div>
@@ -520,7 +476,7 @@ function App() {
 
           <div ref={platformStageRef} className="platform-pin-stage mt-8 hidden lg:block" style={{ height: `${features.length * 100}vh` }}>
             <div className="platform-pin-frame">
-              <AmbientGrid />
+              <BackgroundFlow />
               <div className="page-wrap relative z-10 grid w-full grid-cols-[.95fr_1.05fr] items-center gap-10 px-6">
                 <div className="platform-copy-shell">
                   <div className="platform-progress-rail" aria-hidden="true">
@@ -552,17 +508,19 @@ function App() {
         </section>
 
         <section className="journey-section section-space" id="journey">
-          <div className="journey-grid" aria-hidden="true" />
-          <div className="journey-glow journey-glow-left" aria-hidden="true" />
-          <div className="journey-glow journey-glow-right" aria-hidden="true" />
+          <BackgroundFlow variant="journey" />
           <div className="page-wrap relative z-10">
             <div className="grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:gap-20">
-              <div className="reveal lg:sticky lg:top-32 lg:self-start"><h2 className="section-title mt-6">From ambition<br />to momentum.</h2><p className="section-copy mt-5">Career growth is not a transaction. It is a connected loop that gets stronger with better context, clearer signals, and the right relationships.</p><a href="#join" className="button-secondary mt-8">Start your journey <ArrowRight size={15} /></a></div>
+              <div className="reveal lg:sticky lg:top-32 lg:self-start">
+                <h2 className="section-title mt-6">From ambition<br />to <span className="journey-heading-accent">momentum.</span></h2>
+                <p className="section-copy mt-5">Career growth is not a transaction. It is a connected loop that gets stronger with better context, clearer signals, and the right relationships.</p>
+                <a href="#join" className="journey-cta mt-8"><span>Start your journey</span><span className="journey-cta-arrow" aria-hidden="true"><ArrowRight size={16} /></span></a>
+              </div>
               <div className="journey-stack relative">
                 <div className="journey-rail" aria-hidden="true" />
                 {journey.map((item, index) => <div key={item.number} style={{ transitionDelay: `${index * 80}ms` }} className="reveal journey-card-wrap">
-                  <article className={`journey-card journey-card-${index + 1} ${index === 0 ? 'journey-card-featured' : ''}`}>
-                    <span className="journey-number">{item.number}</span>
+                  <article className={`journey-card journey-card-${index + 1}`}>
+                    <span className="journey-number"><span>{item.number}</span></span>
                     <div className="relative z-10"><div className="mb-3 flex items-center gap-3"><h3 className="text-xl font-semibold text-ink">{item.title}</h3>{index === 3 && <Sparkles size={16} className="text-brand-coral" />}</div><p className="max-w-xl text-sm leading-6 text-slate-500 sm:text-base sm:leading-7">{item.copy}</p></div>
                   </article>
                 </div>)}
@@ -572,16 +530,15 @@ function App() {
         </section>
 
         <section id="one" className="section-space relative bg-ink text-white">
-          <div className="absolute inset-0 one-grid opacity-20" />
-          <AmbientGrid dark />
-          <div className="page-wrap relative z-10 grid items-center gap-14 lg:grid-cols-2">
+          <BackgroundFlow dark variant="one" />
+          <div className="page-wrap relative z-10 grid items-center gap-16 lg:grid-cols-2 lg:gap-24 xl:gap-32">
             <div className="reveal"><h2 className="mt-7 text-4xl font-medium leading-[1.03] tracking-[-.045em] sm:text-6xl">The context you need,<br /><span className="text-brand-teal">right when it matters.</span></h2><p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">YGrow One connects the opportunity in front of you with the experience behind you-so preparation feels relevant, interviews feel calmer, and each result sharpens the next move.</p><div className="mt-8 grid gap-4 sm:grid-cols-2">{[['Grounded, not generic', 'Uses your real projects, skills, and responsibilities.'], ['Always connected', 'Works alongside your profile, pipeline, and interview history.'], ['Built to assist', 'Surfaces useful context while your judgment stays in control.'], ['Learns with you', 'Turns interview notes and outcomes into future insight.']].map(([title, copy]) => <div key={title} className="flex gap-3"><CircleCheck size={18} className="mt-0.5 shrink-0 text-brand-teal" /><div><p className="text-sm font-semibold">{title}</p><p className="mt-1 text-xs leading-5 text-slate-400">{copy}</p></div></div>)}</div></div>
-            <div className="reveal reveal-right reveal-delay-1 relative"><div className="relative rounded-[20px] border border-brand-teal/20 bg-white/[.07] p-5 backdrop-blur sm:p-7"><div className="flex items-center justify-between border-b border-white/10 pb-5"><div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-teal text-ink"><Sparkles size={20} /></span><div><p className="font-bold">YGrow One</p><p className="text-xs text-slate-400">Interview companion</p></div></div><span className="flex items-center gap-1.5 rounded-full border border-brand-teal/25 bg-brand-teal/10 px-3 py-1.5 text-[9px] font-bold text-white/80"><i className="h-1.5 w-1.5 rounded-full bg-brand-teal" /> CONTEXT READY</span></div><div className="my-5 flex gap-3 rounded-xl bg-brand-navy/45 p-4"><MessageSquareText size={17} className="mt-0.5 shrink-0 text-brand-teal" /><p className="text-sm leading-6 text-slate-200">Tell me about a technical decision you changed after receiving feedback.</p></div><div className="space-y-3">{[['Best example', 'The observability rollout at Orbit'], ['Why it fits', 'Shows technical judgment + cross-team collaboration'], ['Key result', 'Alert noise reduced 46% in six weeks']].map(([label, value]) => <div key={label} className="rounded-xl border border-white/10 bg-white/[.05] p-3.5"><p className="text-[9px] font-bold uppercase tracking-[.15em] text-brand-teal">{label}</p><p className="mt-1.5 text-sm text-slate-200">{value}</p></div>)}</div><div className="mt-5 flex items-center gap-2 text-[10px] text-slate-400"><ShieldCheck size={13} className="text-brand-teal" /> Built around your context. You stay in control.</div></div></div>
+            <div className="reveal reveal-right reveal-delay-1 relative"><ContextDiagram /></div>
           </div>
         </section>
 
-        <section id="teams" className="pattern-section pattern-section-teams section-space">
-          <SectionPattern variant="teams" />
+        <section id="teams" className="flow-section flow-section-teams section-space">
+          <BackgroundFlow variant="teams" />
           <div className="page-wrap relative z-10"><div className="reveal section-heading"><h2>A stronger network creates<br />better opportunities.</h2><p>YGrow is designed to make every side of the developer career ecosystem more human, relevant, and connected.</p></div><div className="mt-14 grid gap-5 md:grid-cols-3">{[
             { icon: Code2, tag: 'For developers', title: 'Build a career, not just a job search.', copy: 'Create a richer professional identity, connect with people who matter, and navigate each opportunity with clarity.', points: ['Career profile', 'Network & referrals', 'Opportunity workspace'] },
             { icon: Search, tag: 'For talent teams', title: 'Discover context beyond keywords.', copy: 'Understand the developer behind the résumé and build stronger candidate relationships from the first conversation.', points: ['Developer discovery', 'Context-rich matching', 'Connected outreach'] },
@@ -589,42 +546,51 @@ function App() {
           ].map((card, i) => { const Icon = card.icon; return <article key={card.tag} style={{ transitionDelay: `${i * 100}ms` }} className={`reveal group rounded-[18px] border p-8 transition duration-300 hover:-translate-y-1 ${i === 1 ? 'border-brand-navy bg-ink text-white' : 'border-brand-blue/10 bg-white'}`}><span className={`grid h-12 w-12 place-items-center rounded-lg ${i === 1 ? 'bg-brand-teal/15 text-brand-teal' : i === 0 ? 'bg-brand-blue/10 text-brand-blue' : 'bg-brand-coral/10 text-brand-coral'}`}><Icon size={21} /></span><p className={`mt-8 text-[10px] font-semibold uppercase tracking-[.17em] ${i === 1 ? 'text-brand-teal' : i === 0 ? 'text-brand-blue' : 'text-brand-coral'}`}>{card.tag}</p><h3 className="mt-3 text-2xl font-medium leading-tight">{card.title}</h3><p className={`mt-4 text-sm leading-6 ${i === 1 ? 'text-slate-300' : 'text-slate-500'}`}>{card.copy}</p><div className={`my-7 h-px ${i === 1 ? 'bg-white/10' : 'bg-brand-blue/10'}`} />{card.points.map(point => <p key={point} className="mb-3 flex items-center gap-2 text-sm font-medium"><Check size={14} className={i === 1 ? 'text-brand-teal' : i === 0 ? 'text-brand-blue' : 'text-brand-coral'} />{point}</p>)}</article> })}</div></div>
         </section>
 
-        <section id="faq" className="pattern-section pattern-section-faq section-space">
-          <SectionPattern variant="faq" />
-          <div className="page-wrap relative z-10 grid gap-12 lg:grid-cols-[.65fr_1.35fr] lg:gap-20"><div className="reveal"><h2 className="section-title mt-6">Good to know.</h2><p className="section-copy mt-5">Have something else in mind? Reach us at <a className="font-semibold text-brand-blue underline decoration-brand-blue/35 underline-offset-4" href="mailto:hello@ygrow.com">hello@ygrow.com</a>.</p></div><div className="reveal reveal-right divide-y divide-slate-200">{faqs.map((faq, index) => <div key={faq.q}><button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} className="flex w-full items-center justify-between gap-5 py-6 text-left"><span className="text-lg font-bold text-ink">{faq.q}</span><span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border transition ${openFaq === index ? 'rotate-180 border-brand-blue bg-brand-blue text-white' : 'border-slate-200 bg-white text-brand-blue'}`}><ChevronDown size={15} /></span></button><div className={`grid transition-[grid-template-rows] duration-300 ${openFaq === index ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}><div className="overflow-hidden"><p className="max-w-2xl pb-6 pr-12 text-sm leading-7 text-slate-500 sm:text-base">{faq.a}</p></div></div></div>)}</div></div>
-        </section>
-
-        <section className="join-section">
-          <div className="join-grid-fragment join-grid-a" aria-hidden="true" />
-          <div className="join-grid-fragment join-grid-b" aria-hidden="true" />
-          <div className="join-grid-fragment join-grid-c" aria-hidden="true" />
-          <div className="join-grid-fragment join-grid-d" aria-hidden="true" />
-          <div className="join-grid-fragment join-grid-e" aria-hidden="true" />
-          <div className="join-grid-fragment join-grid-f" aria-hidden="true" />
-          <div className="join-grid-fragment join-grid-g" aria-hidden="true" />
-          <div className="join-grid-fragment join-grid-h" aria-hidden="true" />
-          <div className="join-guides" aria-hidden="true">
-            <span className="join-guide join-guide-h1" /><span className="join-guide join-guide-h2" /><span className="join-guide join-guide-h3" /><span className="join-guide join-guide-h4" />
-            <span className="join-guide join-guide-v1" /><span className="join-guide join-guide-v2" /><span className="join-guide join-guide-v3" /><span className="join-guide join-guide-v4" />
-          </div>
-          <div className="join-dots join-dots-top" aria-hidden="true" />
-          <div className="join-dots join-dots-bottom" aria-hidden="true" />
-          <div className="page-wrap relative z-10">
-            <div className="reveal max-w-3xl">
-              <h2 className="mt-7 text-4xl font-medium leading-[1.03] tracking-[-.05em] text-ink sm:text-6xl lg:text-7xl">Your career is yours.<br /><span className="text-brand-blue">The path can be shared.</span></h2>
-              <p className="mt-7 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">Join the developer network built to turn profiles, people, opportunities, and context into lasting career momentum.</p>
-              <div className="join-form mt-9 max-w-xl"><WaitlistForm compact /></div>
+        <section id="faq" className="flow-section flow-section-faq section-space">
+          <BackgroundFlow variant="faq" />
+          <div className="page-wrap relative z-10 grid gap-14 lg:grid-cols-[.72fr_1.28fr] lg:gap-24">
+            <div className="reveal">
+              <h2 className="section-title mt-6">Good to <span className="text-brand-blue">know.</span></h2>
+              <p className="section-copy mt-5">Quick context for the most common questions. Have something else in mind? Reach us at <a className="font-semibold text-brand-blue underline decoration-brand-blue/35 underline-offset-4" href="mailto:hello@ygrow.com">hello@ygrow.com</a>.</p>
+              <div className="faq-signal-rail" aria-hidden="true"><span /><i /><i /><i /><i /></div>
+            </div>
+            <div className="faq-list reveal reveal-right">
+              {faqs.map((faq, index) => {
+                const isOpen = openFaq === index
+                return <article key={faq.q} className={`faq-item faq-tone-${(index % 4) + 1} ${isOpen ? 'is-open' : ''}`} style={{ animationDelay: `${140 + index * 85}ms` }}>
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-answer-${index}`}
+                    onClick={() => setOpenFaq(isOpen ? -1 : index)}
+                    className="faq-trigger"
+                  >
+                    <span className="faq-index">0{index + 1}</span>
+                    <span className="faq-question">{faq.q}</span>
+                    <span className="faq-toggle" aria-hidden="true"><ChevronDown size={16} /></span>
+                  </button>
+                  <div id={`faq-answer-${index}`} className={`faq-answer ${isOpen ? 'is-open' : ''}`}>
+                    <div><p>{faq.a}</p></div>
+                  </div>
+                </article>
+              })}
             </div>
           </div>
         </section>
       </main>
 
       <footer className="site-footer bg-ink px-4 pb-8 pt-16 text-white sm:px-6">
-        <div className="page-wrap"><div className="grid gap-12 border-b border-white/10 pb-12 lg:grid-cols-[1.4fr_repeat(3,1fr)]"><div><BrandMark light /><p className="mt-5 max-w-xs text-sm leading-6 text-slate-400">A connected career network helping developers build their identity, network, opportunities, and momentum.</p><p className="mt-5 text-xs font-bold uppercase tracking-[.17em] text-brand-teal">Why grow alone?</p></div>{[
-          ['Platform', ['Developer profile', 'Opportunities', 'Career workspace', 'YGrow One']],
-          ['Community', ['For developers', 'For companies', 'For recruiters', 'Partnerships']],
-          ['Company', ['About', 'Blog', 'Help center', 'Contact']],
-        ].map(([title, links]) => <div key={title as string}><p className="mb-4 text-xs font-bold uppercase tracking-[.16em] text-slate-500">{title as string}</p>{(links as string[]).map(link => <a key={link} href="#join" className="mb-3 block text-sm text-slate-300 transition hover:text-white">{link}</a>)}</div>)}</div><div className="flex flex-col gap-4 pt-7 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"><p>© 2026 YGrow. Built for developers who keep growing.</p><div className="flex gap-5"><a href="#" className="hover:text-white">Privacy</a><a href="#" className="hover:text-white">Terms</a><a href="#" className="hover:text-white">Responsible AI</a></div></div></div>
+        <div className="page-wrap">
+          <div className="grid gap-12 border-b border-white/10 pb-12 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
+            <div><BrandMark light /><p className="mt-5 max-w-xs text-sm leading-6 text-slate-400">A connected career network helping developers build their identity, network, opportunities, and momentum.</p><p className="mt-5 text-xs font-bold uppercase tracking-[.17em] text-brand-teal">Why grow alone?</p></div>
+            {[
+              { title: 'Explore', links: [['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one']] },
+              { title: 'Learn', links: [['For teams', '#teams'], ['Good to know', '#faq'], ['Email us', 'mailto:hello@ygrow.com']] },
+              { title: 'Early access', links: [['Subscribe', '#join']] },
+            ].map((group) => <nav key={group.title} aria-label={`${group.title} links`}><p className="mb-4 text-xs font-bold uppercase tracking-[.16em] text-slate-500">{group.title}</p>{group.links.map(([label, href]) => <a key={label} href={href} className="mb-3 block text-sm text-slate-300 transition hover:text-white">{label}</a>)}</nav>)}
+          </div>
+          <div className="flex flex-col gap-4 pt-7 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"><p>© 2026 YGrow. Built for developers who keep growing.</p><div className="flex gap-5"><a href="mailto:hello@ygrow.com" className="hover:text-white">Contact</a><a href="#top" className="hover:text-white">Back to top</a></div></div>
+        </div>
       </footer>
     </div>
   )
