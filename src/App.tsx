@@ -18,9 +18,9 @@ import {
   Target,
   Users,
   X,
-  Zap,
 } from 'lucide-react'
 import { createClient } from '@supabase/supabase-js'
+import CareerOrbit from './components/CareerOrbit'
 
 type Feature = {
   id: string
@@ -35,7 +35,7 @@ type Feature = {
 const features: Feature[] = [
   {
     id: 'identity',
-    tone: 'navy',
+    tone: 'coral',
     eyebrow: 'Professional identity',
     title: 'Your whole career, not just a résumé.',
     description:
@@ -45,7 +45,7 @@ const features: Feature[] = [
   },
   {
     id: 'opportunities',
-    tone: 'coral',
+    tone: 'blue',
     eyebrow: 'Relevant opportunities',
     title: 'Find the roles that fit your next chapter.',
     description:
@@ -65,7 +65,7 @@ const features: Feature[] = [
   },
   {
     id: 'one',
-    tone: 'blue',
+    tone: 'navy',
     eyebrow: 'YGrow One',
     title: 'Prepare with context. Show up as yourself.',
     description:
@@ -73,6 +73,14 @@ const features: Feature[] = [
     benefits: ['Grounded in your experience', 'Role-specific preparation', 'Continuous interview learning'],
     icon: Sparkles,
   },
+]
+
+const heroTopics = [
+  { lines: ['GROW', 'TOGETHER'], animation: 'slide' },
+  { lines: ['BUILD', 'YOUR STORY'], animation: 'flicker' },
+  { lines: ['FIND', 'YOUR FIT'], animation: 'focus' },
+  { lines: ['MOVE', 'FORWARD'], animation: 'type' },
+  { lines: ['RISE', 'TOGETHER'], animation: 'split' },
 ]
 
 const journey = [
@@ -263,7 +271,7 @@ export function DashboardPreview() {
           <main className="min-w-0 p-4 sm:p-5">
             <div className="mb-5 flex items-center justify-between">
               <div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-slate-400">Career command center</p><h3 className="mt-1  text-base font-bold text-ink sm:text-lg">Good morning, Maya</h3></div>
-              <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-brand-blue to-brand-teal text-[10px] font-bold text-white">MK</div>
+              <div className="grid h-8 w-8 place-items-center rounded-full bg-brand-blue text-[10px] font-bold text-white shadow-glow">MK</div>
             </div>
             <div className="mb-4 grid grid-cols-3 gap-2">
               {[['12', 'Opportunities'], ['04', 'Interviews'], ['08', 'Connections']].map(([value, label]) => (
@@ -309,7 +317,6 @@ function ProductVisual({ active }: { active: number }) {
   const Icon = feature.icon
   return (
     <div className={`feature-theme feature-theme-${feature.tone} product-visual-shell relative min-h-[420px] overflow-hidden rounded-[22px] p-6 text-white sm:p-9 lg:min-h-[560px]`}>
-      <div className="product-visual-glow absolute -right-24 -top-24 h-64 w-64 rounded-full blur-3xl" />
       <div className="visual-enter relative flex h-full min-h-[350px] flex-col lg:min-h-[488px]">
         <div className="flex items-center justify-between">
           <span className="product-visual-icon grid h-12 w-12 place-items-center rounded-2xl"><Icon size={22} /></span>
@@ -341,7 +348,7 @@ function MatchCard() {
 
 function PipelineCard() {
   const stages = [['Saved', '08', 'w-[38%]'], ['Connected', '05', 'w-[52%]'], ['Interview', '03', 'w-[72%]'], ['Final stage', '01', 'w-[92%]']]
-  return <div className="mt-10 rounded-3xl border border-white/10 bg-white/[.06] p-5"><div className="mb-6 flex items-center justify-between"><div><p className="font-bold">Your career pipeline</p><p className="mt-1 text-[10px] text-slate-400">Everything moving, nothing lost.</p></div><span className="product-accent-text text-xs font-bold">17 active</span></div><div className="space-y-4">{stages.map(([stage, count, width]) => <div key={stage}><div className="mb-1.5 flex justify-between text-[10px]"><span className="text-slate-300">{stage}</span><b>{count}</b></div><div className="h-1.5 rounded-full bg-white/10"><div className={`product-accent-gradient h-full ${width} rounded-full`} /></div></div>)}</div></div>
+  return <div className="mt-10 rounded-3xl border border-white/10 bg-white/[.06] p-5"><div className="mb-6 flex items-center justify-between"><div><p className="font-bold">Your career pipeline</p><p className="mt-1 text-[10px] text-slate-400">Everything moving, nothing lost.</p></div><span className="product-accent-text text-xs font-bold">17 active</span></div><div className="space-y-4">{stages.map(([stage, count, width]) => <div key={stage}><div className="mb-1.5 flex justify-between text-[10px]"><span className="text-slate-300">{stage}</span><b>{count}</b></div><div className="h-1.5 rounded-full bg-white/10"><div className={`product-accent-fill h-full ${width} rounded-full`} /></div></div>)}</div></div>
 }
 
 function OneCard() {
@@ -391,12 +398,22 @@ function App() {
   const [activeFeature, setActiveFeature] = useState(0)
   const [openFaq, setOpenFaq] = useState(0)
   const [scrolled, setScrolled] = useState(false)
+  const [heroTopic, setHeroTopic] = useState(0)
+  const [platformProgress, setPlatformProgress] = useState(0)
   const platformStageRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const interval = window.setInterval(() => {
+      setHeroTopic((current) => (current + 1) % heroTopics.length)
+    }, 3600)
+    return () => window.clearInterval(interval)
   }, [])
 
   useEffect(() => {
@@ -429,8 +446,9 @@ function App() {
       const bounds = stage.getBoundingClientRect()
       const scrollDistance = Math.max(stage.offsetHeight - window.innerHeight, 1)
       const progress = Math.min(0.9999, Math.max(0, -bounds.top / scrollDistance))
-      const nextFeature = Math.min(features.length - 1, Math.floor(progress * features.length))
+      const nextFeature = Math.min(features.length - 1, Math.round(progress * (features.length - 1)))
       setActiveFeature((current) => current === nextFeature ? current : nextFeature)
+      setPlatformProgress((current) => Math.abs(current - progress) < .001 ? current : progress)
     }
 
     const requestUpdate = () => {
@@ -466,7 +484,21 @@ function App() {
         <section className="hero-grid relative flex min-h-[100svh] items-center px-4 pb-20 pt-28 sm:pb-24 sm:pt-32">
           <div className="page-wrap relative z-10">
             <div className="reveal max-w-3xl text-left">
-              <h1 className=" text-[clamp(3.7rem,9vw,7.5rem)] font-medium leading-[.9] tracking-[-.04em] text-white">GROW<br />TOGETHER</h1>
+              <h1
+                key={heroTopic}
+                aria-label={heroTopics[heroTopic].lines.join(' ')}
+                className={`hero-topic-heading hero-topic-${heroTopics[heroTopic].animation} text-[clamp(3.7rem,9vw,7.5rem)] font-medium leading-[.9] tracking-[-.04em] text-white`}
+              >
+                {heroTopics[heroTopic].animation === 'type'
+                  ? heroTopics[heroTopic].lines.map((line, lineIndex) => {
+                    const delayOffset = lineIndex === 0 ? 0 : heroTopics[heroTopic].lines[0].length * 65 + 140
+                    return <span key={line} className="hero-topic-line hero-type-line" aria-hidden="true">
+                      {Array.from(line).map((letter, letterIndex) => <span key={`${letter}-${letterIndex}`} className="hero-type-letter" style={{ animationDelay: `${delayOffset + letterIndex * 65}ms` }}>{letter === ' ' ? '\u00a0' : letter}</span>)}
+                      {lineIndex === 1 && <span className="hero-type-cursor" />}
+                    </span>
+                  })
+                  : heroTopics[heroTopic].lines.map((line, lineIndex) => <span key={line} className={`hero-topic-line ${lineIndex === 1 ? 'hero-topic-line-delay' : ''}`} aria-hidden="true">{line}</span>)}
+              </h1>
               <p className="mt-8 max-w-2xl text-lg leading-8 text-white/75 sm:text-xl">Build your professional identity, discover better opportunities, and move your career forward with the right people-and <strong className="font-semibold text-white">YGrow One</strong>-beside you.</p>
               <div id="join" className="mt-10 max-w-xl"><WaitlistForm /></div>
               <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-white/65"><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> Free to join</span><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> Built developer-first</span><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> You stay in control</span></div>
@@ -478,35 +510,32 @@ function App() {
           <div className="network-stripes" aria-hidden="true">
             {['navy', 'coral', 'teal', 'blue', 'coral', 'navy', 'blue', 'teal', 'navy', 'coral', 'teal', 'blue'].map((tone, index) => <i key={`${tone}-${index}`} className={`network-stripe network-stripe-${tone} network-stripe-${index + 1}`} />)}
           </div>
-          <div className="page-wrap relative z-10"><p className="mb-6 text-center text-[10px] font-bold uppercase tracking-[.22em] text-slate-400">One network for every stage of developer growth</p><div className="grid grid-cols-2 gap-5 text-slate-400 sm:grid-cols-3 lg:grid-cols-6">{[[Code2, 'Developers'], [BriefcaseBusiness, 'Companies'], [Search, 'Recruiters'], [Users, 'Communities'], [Target, 'Coaches'], [Network, 'Universities']].map(([Icon, label]) => <div key={label as string} className="flex items-center justify-center gap-2 text-sm font-bold"><Icon size={17} />{label as string}</div>)}</div></div>
+          <div className="page-wrap relative z-10"><p className="network-flow-title mb-6 text-center text-[10px] font-bold uppercase tracking-[.22em] text-slate-400">One network for every stage of developer growth</p><div className="grid grid-cols-2 gap-5 text-slate-400 sm:grid-cols-3 lg:grid-cols-6">{[[Code2, 'Developers'], [BriefcaseBusiness, 'Companies'], [Search, 'Recruiters'], [Users, 'Communities'], [Target, 'Coaches'], [Network, 'Universities']].map(([Icon, label], index) => <div key={label as string} className="network-flow-item flex items-center justify-center gap-2 text-sm font-bold" style={{ animationDelay: `${index * 140}ms` }}><Icon size={17} />{label as string}</div>)}</div></div>
         </section>
 
         <section className="platform-section pt-24 sm:pt-28 lg:pt-36" id="platform">
           <div className="page-wrap px-4 sm:px-6">
-            <div className="reveal section-heading"><h2>Your career deserves<br />more than <span className="platform-title-accent">disconnected tools.</span></h2><p>Scroll through one <span className="platform-copy-teal">connected journey</span>—from the story you have built to the <span className="platform-copy-coral">opportunity ahead.</span></p></div>
+            <div className="reveal section-heading"><h2>Your career deserves<br />more than <span className="platform-title-accent">disconnected tools.</span></h2><p>Scroll through one connected journey — from the story you have built to the opportunity ahead.</p></div>
           </div>
 
           <div ref={platformStageRef} className="platform-pin-stage mt-8 hidden lg:block" style={{ height: `${features.length * 100}vh` }}>
             <div className="platform-pin-frame">
               <AmbientGrid />
-              <div className="page-wrap relative z-10 grid w-full grid-cols-[.78fr_1.22fr] items-center gap-16 px-6">
+              <div className="page-wrap relative z-10 grid w-full grid-cols-[.95fr_1.05fr] items-center gap-10 px-6">
                 <div className="platform-copy-shell">
                   <div className="platform-progress-rail" aria-hidden="true">
-                    <span className="platform-progress-fill" style={{ height: `${(activeFeature / (features.length - 1)) * 100}%` }} />
-                    {features.map((feature, index) => <i key={feature.id} className={`feature-dot-${feature.tone} ${activeFeature === index ? 'is-active' : activeFeature > index ? 'is-complete' : ''}`} style={{ top: `${(index / (features.length - 1)) * 100}%` }} />)}
+                    {features.slice(0, -1).map((feature, index) => <span key={`${feature.id}-segment`} className={`platform-progress-segment feature-theme-${feature.tone} ${activeFeature > index ? 'is-complete' : ''}`} style={{ top: `${(index / (features.length - 1)) * 100}%`, height: `${100 / (features.length - 1)}%` }} />)}
+                    {features.map((feature, index) => <span key={feature.id} className={`platform-progress-point feature-theme-${feature.tone} ${activeFeature === index ? 'is-active' : activeFeature > index ? 'is-complete' : ''}`} style={{ top: `${(index / (features.length - 1)) * 100}%` }}><i>0{index + 1}</i><b>{feature.eyebrow}</b></span>)}
                   </div>
-                  <div key={features[activeFeature].id} className={`feature-theme feature-theme-${features[activeFeature].tone} platform-copy-enter pl-14`}>
-                    {(() => { const Icon = features[activeFeature].icon; return <>
-                      <div className="mb-7 flex items-center justify-between"><span className="feature-icon grid h-14 w-14 place-items-center rounded-xl"><Icon size={21} /></span><span className="feature-number text-xs font-semibold tracking-[.14em]">0{activeFeature + 1}</span></div>
-                      <p className="feature-kicker text-[10px] font-semibold uppercase tracking-[.17em]">{features[activeFeature].eyebrow}</p>
-                      <h3 className="feature-title mt-3 text-[2rem] font-bold leading-[1.15] tracking-[-.04em]">{features[activeFeature].title}</h3>
-                      <p className="feature-description mt-5 max-w-md text-base leading-8">{features[activeFeature].description}</p>
-                      <div className="mt-7 space-y-3">{features[activeFeature].benefits.map((benefit) => <p key={benefit} className="flex items-center gap-2.5 text-sm font-semibold text-slate-600"><Check size={15} className="feature-check" />{benefit}</p>)}</div>
-                    </> })()}
+                  <div key={features[activeFeature].id} className={`feature-theme feature-theme-${features[activeFeature].tone} platform-copy-enter platform-copy-content`}>
+                    <span className="feature-number platform-feature-number text-xs font-semibold tracking-[.14em]">0{activeFeature + 1}</span>
+                    <h3 className="feature-title text-[2rem] font-bold leading-[1.15] tracking-[-.04em]">{features[activeFeature].title}</h3>
+                    <p className="feature-description mt-5 max-w-md text-base leading-8">{features[activeFeature].description}</p>
+                    <div className="mt-7 space-y-3">{features[activeFeature].benefits.map((benefit) => <p key={benefit} className="flex items-center gap-2.5 text-sm font-semibold text-slate-600"><Check size={15} className="feature-check" />{benefit}</p>)}</div>
                   </div>
                 </div>
                 <div>
-                  <div key={features[activeFeature].id}><ProductVisual active={activeFeature} /></div>
+                  <CareerOrbit active={activeFeature} progress={platformProgress} />
                   <div className="mt-5 flex items-center justify-between px-2"><p className="text-xs font-semibold text-slate-400">Scroll to move through the platform</p><div className="flex gap-1.5">{features.map((feature, index) => <span key={feature.id} className={`platform-pagination-dot feature-theme-${feature.tone} h-1.5 rounded-full transition-all duration-500 ${activeFeature === index ? 'is-active w-8' : 'w-1.5'}`} />)}</div></div>
                 </div>
               </div>
@@ -528,7 +557,7 @@ function App() {
           <div className="journey-glow journey-glow-right" aria-hidden="true" />
           <div className="page-wrap relative z-10">
             <div className="grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:gap-20">
-              <div className="reveal lg:sticky lg:top-32 lg:self-start"><div className="eyebrow"><Zap size={13} /> A better career rhythm</div><h2 className="section-title mt-6">From ambition<br />to momentum.</h2><p className="section-copy mt-5">Career growth is not a transaction. It is a connected loop that gets stronger with better context, clearer signals, and the right relationships.</p><a href="#join" className="button-secondary mt-8">Start your journey <ArrowRight size={15} /></a></div>
+              <div className="reveal lg:sticky lg:top-32 lg:self-start"><h2 className="section-title mt-6">From ambition<br />to momentum.</h2><p className="section-copy mt-5">Career growth is not a transaction. It is a connected loop that gets stronger with better context, clearer signals, and the right relationships.</p><a href="#join" className="button-secondary mt-8">Start your journey <ArrowRight size={15} /></a></div>
               <div className="journey-stack relative">
                 <div className="journey-rail" aria-hidden="true" />
                 {journey.map((item, index) => <div key={item.number} style={{ transitionDelay: `${index * 80}ms` }} className="reveal journey-card-wrap">
@@ -546,14 +575,14 @@ function App() {
           <div className="absolute inset-0 one-grid opacity-20" />
           <AmbientGrid dark />
           <div className="page-wrap relative z-10 grid items-center gap-14 lg:grid-cols-2">
-            <div className="reveal"><div className="eyebrow eyebrow-dark"><Sparkles size={13} /> Meet YGrow One</div><h2 className="mt-7 text-4xl font-medium leading-[1.03] tracking-[-.045em] sm:text-6xl">The context you need,<br /><span className="text-brand-teal">right when it matters.</span></h2><p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">YGrow One connects the opportunity in front of you with the experience behind you-so preparation feels relevant, interviews feel calmer, and each result sharpens the next move.</p><div className="mt-8 grid gap-4 sm:grid-cols-2">{[['Grounded, not generic', 'Uses your real projects, skills, and responsibilities.'], ['Always connected', 'Works alongside your profile, pipeline, and interview history.'], ['Built to assist', 'Surfaces useful context while your judgment stays in control.'], ['Learns with you', 'Turns interview notes and outcomes into future insight.']].map(([title, copy]) => <div key={title} className="flex gap-3"><CircleCheck size={18} className="mt-0.5 shrink-0 text-brand-teal" /><div><p className="text-sm font-semibold">{title}</p><p className="mt-1 text-xs leading-5 text-slate-400">{copy}</p></div></div>)}</div></div>
-            <div className="reveal reveal-right reveal-delay-1 relative"><div className="absolute inset-10 rounded-full bg-brand-teal/20 blur-[90px]" /><div className="relative rounded-[20px] border border-brand-teal/20 bg-white/[.07] p-5 backdrop-blur sm:p-7"><div className="flex items-center justify-between border-b border-white/10 pb-5"><div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-teal text-ink"><Sparkles size={20} /></span><div><p className="font-bold">YGrow One</p><p className="text-xs text-slate-400">Interview companion</p></div></div><span className="flex items-center gap-1.5 rounded-full border border-brand-teal/25 bg-brand-teal/10 px-3 py-1.5 text-[9px] font-bold text-white/80"><i className="h-1.5 w-1.5 rounded-full bg-brand-teal" /> CONTEXT READY</span></div><div className="my-5 flex gap-3 rounded-xl bg-brand-navy/45 p-4"><MessageSquareText size={17} className="mt-0.5 shrink-0 text-brand-teal" /><p className="text-sm leading-6 text-slate-200">Tell me about a technical decision you changed after receiving feedback.</p></div><div className="space-y-3">{[['Best example', 'The observability rollout at Orbit'], ['Why it fits', 'Shows technical judgment + cross-team collaboration'], ['Key result', 'Alert noise reduced 46% in six weeks']].map(([label, value]) => <div key={label} className="rounded-xl border border-white/10 bg-white/[.05] p-3.5"><p className="text-[9px] font-bold uppercase tracking-[.15em] text-brand-teal">{label}</p><p className="mt-1.5 text-sm text-slate-200">{value}</p></div>)}</div><div className="mt-5 flex items-center gap-2 text-[10px] text-slate-400"><ShieldCheck size={13} className="text-brand-teal" /> Built around your context. You stay in control.</div></div></div>
+            <div className="reveal"><h2 className="mt-7 text-4xl font-medium leading-[1.03] tracking-[-.045em] sm:text-6xl">The context you need,<br /><span className="text-brand-teal">right when it matters.</span></h2><p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">YGrow One connects the opportunity in front of you with the experience behind you-so preparation feels relevant, interviews feel calmer, and each result sharpens the next move.</p><div className="mt-8 grid gap-4 sm:grid-cols-2">{[['Grounded, not generic', 'Uses your real projects, skills, and responsibilities.'], ['Always connected', 'Works alongside your profile, pipeline, and interview history.'], ['Built to assist', 'Surfaces useful context while your judgment stays in control.'], ['Learns with you', 'Turns interview notes and outcomes into future insight.']].map(([title, copy]) => <div key={title} className="flex gap-3"><CircleCheck size={18} className="mt-0.5 shrink-0 text-brand-teal" /><div><p className="text-sm font-semibold">{title}</p><p className="mt-1 text-xs leading-5 text-slate-400">{copy}</p></div></div>)}</div></div>
+            <div className="reveal reveal-right reveal-delay-1 relative"><div className="relative rounded-[20px] border border-brand-teal/20 bg-white/[.07] p-5 backdrop-blur sm:p-7"><div className="flex items-center justify-between border-b border-white/10 pb-5"><div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-teal text-ink"><Sparkles size={20} /></span><div><p className="font-bold">YGrow One</p><p className="text-xs text-slate-400">Interview companion</p></div></div><span className="flex items-center gap-1.5 rounded-full border border-brand-teal/25 bg-brand-teal/10 px-3 py-1.5 text-[9px] font-bold text-white/80"><i className="h-1.5 w-1.5 rounded-full bg-brand-teal" /> CONTEXT READY</span></div><div className="my-5 flex gap-3 rounded-xl bg-brand-navy/45 p-4"><MessageSquareText size={17} className="mt-0.5 shrink-0 text-brand-teal" /><p className="text-sm leading-6 text-slate-200">Tell me about a technical decision you changed after receiving feedback.</p></div><div className="space-y-3">{[['Best example', 'The observability rollout at Orbit'], ['Why it fits', 'Shows technical judgment + cross-team collaboration'], ['Key result', 'Alert noise reduced 46% in six weeks']].map(([label, value]) => <div key={label} className="rounded-xl border border-white/10 bg-white/[.05] p-3.5"><p className="text-[9px] font-bold uppercase tracking-[.15em] text-brand-teal">{label}</p><p className="mt-1.5 text-sm text-slate-200">{value}</p></div>)}</div><div className="mt-5 flex items-center gap-2 text-[10px] text-slate-400"><ShieldCheck size={13} className="text-brand-teal" /> Built around your context. You stay in control.</div></div></div>
           </div>
         </section>
 
         <section id="teams" className="pattern-section pattern-section-teams section-space">
           <SectionPattern variant="teams" />
-          <div className="page-wrap relative z-10"><div className="reveal section-heading"><div className="eyebrow"><Users size={13} /> GROW TOGETHER</div><h2>A stronger network creates<br />better opportunities.</h2><p>YGrow is designed to make every side of the developer career ecosystem more human, relevant, and connected.</p></div><div className="mt-14 grid gap-5 md:grid-cols-3">{[
+          <div className="page-wrap relative z-10"><div className="reveal section-heading"><h2>A stronger network creates<br />better opportunities.</h2><p>YGrow is designed to make every side of the developer career ecosystem more human, relevant, and connected.</p></div><div className="mt-14 grid gap-5 md:grid-cols-3">{[
             { icon: Code2, tag: 'For developers', title: 'Build a career, not just a job search.', copy: 'Create a richer professional identity, connect with people who matter, and navigate each opportunity with clarity.', points: ['Career profile', 'Network & referrals', 'Opportunity workspace'] },
             { icon: Search, tag: 'For talent teams', title: 'Discover context beyond keywords.', copy: 'Understand the developer behind the résumé and build stronger candidate relationships from the first conversation.', points: ['Developer discovery', 'Context-rich matching', 'Connected outreach'] },
             { icon: Network, tag: 'For communities', title: 'Turn support into shared momentum.', copy: 'Help members move from learning to opportunity with better profiles, mentorship, and professional connections.', points: ['Member growth', 'Mentorship pathways', 'Career intelligence'] },
@@ -562,7 +591,7 @@ function App() {
 
         <section id="faq" className="pattern-section pattern-section-faq section-space">
           <SectionPattern variant="faq" />
-          <div className="page-wrap relative z-10 grid gap-12 lg:grid-cols-[.65fr_1.35fr] lg:gap-20"><div className="reveal"><div className="eyebrow"><MessageSquareText size={13} /> Questions, answered</div><h2 className="section-title mt-6">Good to know.</h2><p className="section-copy mt-5">Have something else in mind? Reach us at <a className="font-semibold text-brand-blue underline decoration-brand-blue/35 underline-offset-4" href="mailto:hello@ygrow.com">hello@ygrow.com</a>.</p></div><div className="reveal reveal-right divide-y divide-slate-200">{faqs.map((faq, index) => <div key={faq.q}><button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} className="flex w-full items-center justify-between gap-5 py-6 text-left"><span className="text-lg font-bold text-ink">{faq.q}</span><span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border transition ${openFaq === index ? 'rotate-180 border-brand-blue bg-brand-blue text-white' : 'border-slate-200 bg-white text-brand-blue'}`}><ChevronDown size={15} /></span></button><div className={`grid transition-[grid-template-rows] duration-300 ${openFaq === index ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}><div className="overflow-hidden"><p className="max-w-2xl pb-6 pr-12 text-sm leading-7 text-slate-500 sm:text-base">{faq.a}</p></div></div></div>)}</div></div>
+          <div className="page-wrap relative z-10 grid gap-12 lg:grid-cols-[.65fr_1.35fr] lg:gap-20"><div className="reveal"><h2 className="section-title mt-6">Good to know.</h2><p className="section-copy mt-5">Have something else in mind? Reach us at <a className="font-semibold text-brand-blue underline decoration-brand-blue/35 underline-offset-4" href="mailto:hello@ygrow.com">hello@ygrow.com</a>.</p></div><div className="reveal reveal-right divide-y divide-slate-200">{faqs.map((faq, index) => <div key={faq.q}><button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} className="flex w-full items-center justify-between gap-5 py-6 text-left"><span className="text-lg font-bold text-ink">{faq.q}</span><span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border transition ${openFaq === index ? 'rotate-180 border-brand-blue bg-brand-blue text-white' : 'border-slate-200 bg-white text-brand-blue'}`}><ChevronDown size={15} /></span></button><div className={`grid transition-[grid-template-rows] duration-300 ${openFaq === index ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}><div className="overflow-hidden"><p className="max-w-2xl pb-6 pr-12 text-sm leading-7 text-slate-500 sm:text-base">{faq.a}</p></div></div></div>)}</div></div>
         </section>
 
         <section className="join-section">
@@ -582,7 +611,6 @@ function App() {
           <div className="join-dots join-dots-bottom" aria-hidden="true" />
           <div className="page-wrap relative z-10">
             <div className="reveal max-w-3xl">
-              <div className="eyebrow"><Sparkles size={13} /> A developer network</div>
               <h2 className="mt-7 text-4xl font-medium leading-[1.03] tracking-[-.05em] text-ink sm:text-6xl lg:text-7xl">Your career is yours.<br /><span className="text-brand-blue">The path can be shared.</span></h2>
               <p className="mt-7 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">Join the developer network built to turn profiles, people, opportunities, and context into lasting career momentum.</p>
               <div className="join-form mt-9 max-w-xl"><WaitlistForm compact /></div>
