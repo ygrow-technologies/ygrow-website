@@ -1,0 +1,9 @@
+{
+  "name": "YGrow",
+  "short_name": "YGrow",
+  "description": "The connected career platform for developers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050b1f",
+  "theme_color": "#050b1f"
+}

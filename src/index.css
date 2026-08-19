@@ -73,6 +73,23 @@ body { margin: 0; min-width: 320px; background: var(--mono-paper); }
 button, input, select, textarea { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 ::selection { background: var(--brand-teal); color: var(--brand-navy-deep); }
+:focus-visible { outline: 3px solid rgba(18,200,191,.58); outline-offset: 3px; }
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: .75rem;
+  left: .75rem;
+  transform: translateY(-180%);
+  border-radius: .65rem;
+  background: #ffffff;
+  padding: .7rem 1rem;
+  color: var(--brand-navy-deep);
+  font-size: .8rem;
+  font-weight: 700;
+  box-shadow: 0 12px 30px rgba(0,0,0,.2);
+  transition: transform .2s ease;
+}
+.skip-link:focus { transform: translateY(0); }
 
 /* Runtime-safe monochrome aliases. These also neutralize an already-running
    Tailwind dev server before its configuration is restarted. */

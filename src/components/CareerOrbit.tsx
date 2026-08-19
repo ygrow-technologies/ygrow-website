@@ -36,7 +36,7 @@ export default function CareerOrbit({ active, progress }: CareerOrbitProps) {
         })}
       </div>
       <div className="career-orbit-core">
-        <img className="career-orbit-core-logo" src={logoMono} alt="" />
+        <img className="career-orbit-core-logo" src={logoMono} alt="" width="128" height="128" loading="lazy" decoding="async" />
       </div>
     </div>
   )

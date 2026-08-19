@@ -24,6 +24,7 @@ import {
 import { createClient } from '@supabase/supabase-js'
 import logoDark from './assets/logo-dark.png'
 import logoLight from './assets/logo-light.png'
+import { trackEvent } from './analytics'
 import CareerOrbit from './components/CareerOrbit'
 import ContextDiagram from './components/ContextDiagram'
 import HeroMessage from './components/HeroMessage'
@@ -116,7 +117,7 @@ const contactTopics = ['Product question', 'Talent team', 'Community partnership
 function BrandMark({ light = false }: { light?: boolean }) {
   return (
     <a href="#top" className="group flex items-center gap-0.5" aria-label="YGrow home">
-      <img src={light ? logoLight : logoDark} alt="" aria-hidden="true" className="h-10 w-10 shrink-0 object-contain sm:h-11 sm:w-11" />
+      <img src={light ? logoLight : logoDark} alt="" aria-hidden="true" width="44" height="44" decoding="async" className="h-10 w-10 shrink-0 object-contain sm:h-11 sm:w-11" />
       <span className={`text-[1.35rem] font-extrabold tracking-[-0.05em] ${light ? 'text-white' : 'text-ink'}`}>
         Grow
       </span>
@@ -260,7 +261,7 @@ export function DashboardPreview() {
               </div>
             ))}
           </aside>
-          <main className="min-w-0 p-4 sm:p-5">
+          <div className="min-w-0 p-4 sm:p-5">
             <div className="mb-5 flex items-center justify-between">
               <div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-slate-400">Career command center</p><h3 className="mt-1  text-base font-bold text-ink sm:text-lg">Good morning, Maya</h3></div>
               <div className="grid h-8 w-8 place-items-center rounded-full bg-brand-blue text-[10px] font-bold text-white shadow-glow">MK</div>
@@ -297,7 +298,7 @@ export function DashboardPreview() {
                 </div>
               </div>
             </div>
-          </main>
+          </div>
         </div>
       </div>
     </div>
@@ -369,10 +370,14 @@ function WaitlistForm() {
       const { error } = await supabase.from('waitlist').insert({ email: normalizedEmail, source: 'website' })
       if (error && error.code !== '23505') throw error
 
+      const result = error?.code === '23505' ? 'existing' : 'created'
+      trackEvent('waitlist_submit', { form_name: 'early_access', form_location: 'footer', result })
+      if (result === 'created') trackEvent('generate_lead', { lead_source: 'waitlist', form_location: 'footer' })
       setStatus('success')
       setMessage(error?.code === '23505' ? "You're already on the list." : "You're on the list. We'll be in touch.")
       setEmail('')
     } catch {
+      trackEvent('waitlist_submit', { form_name: 'early_access', form_location: 'footer', result: 'error' })
       setStatus('error'); setMessage('Signup is temporarily unavailable. Please email hello@ygrow.org')
     }
   }
@@ -460,11 +465,13 @@ function ContactForm() {
     const data = new FormData(form)
     const name = String(data.get('name') ?? '').trim()
     const email = String(data.get('email') ?? '').trim()
-    const topic = String(data.get('topic') ?? '').trim()
+    const selectedTopic = String(data.get('topic') ?? '').trim()
     const note = String(data.get('message') ?? '').trim()
-    const subject = encodeURIComponent(`YGrow ${topic} enquiry from ${name}`)
-    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\n${note}`)
+    const subject = encodeURIComponent(`YGrow ${selectedTopic} enquiry from ${name}`)
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nTopic: ${selectedTopic}\n\n${note}`)
 
+    trackEvent('contact_submit', { form_name: 'contact', contact_topic: selectedTopic })
+    trackEvent('generate_lead', { lead_source: 'contact_form', contact_topic: selectedTopic })
     window.location.href = `mailto:hello@ygrow.org?subject=${subject}&body=${body}`
     form.reset()
     setTopic(contactTopics[0])
@@ -543,6 +550,7 @@ function App() {
   const [scrolled, setScrolled] = useState(false)
   const [platformProgress, setPlatformProgress] = useState(0)
   const platformStageRef = useRef<HTMLDivElement>(null)
+  const trackCta = (ctaName: string, location: string) => trackEvent('cta_click', { cta_name: ctaName, cta_location: location })
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -601,6 +609,7 @@ function App() {
 
   return (
     <div id="top" className="surface-page overflow-x-clip text-ink">
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <PageScrollbar />
       <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? 'site-header-scrolled py-3 shadow-sm backdrop-blur-xl' : 'bg-transparent py-5'}`}>
         <div className="page-wrap flex items-center justify-between">
@@ -608,13 +617,13 @@ function App() {
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary navigation">
             {[['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one'], ['For teams', '#teams'], ['FAQ', '#faq'], ['Contact', '#contact']].map(([label, href]) => <a key={label} href={href} className={`text-sm font-semibold transition ${scrolled ? 'text-slate-600 hover:text-ink' : 'text-white/75 hover:text-white'}`}>{label}</a>)}
           </nav>
-          <div className="hidden items-center lg:flex"><a href="#join" className={`button-primary ${scrolled ? '' : 'button-primary-on-dark'}`}>Join YGrow <ArrowRight size={15} /></a></div>
+          <div className="hidden items-center lg:flex"><a href="#join" onClick={() => trackCta('join_ygrow', 'header')} className={`button-primary ${scrolled ? '' : 'button-primary-on-dark'}`}>Join YGrow <ArrowRight size={15} /></a></div>
           <button type="button" onClick={() => setMenuOpen(!menuOpen)} className={`grid h-10 w-10 place-items-center rounded-full border transition lg:hidden ${scrolled ? 'border-slate-200 text-ink' : 'border-white/25 text-white'}`} aria-label="Toggle navigation" aria-expanded={menuOpen} aria-controls="mobile-navigation">{menuOpen ? <X size={18} /> : <Menu size={19} />}</button>
         </div>
-        {menuOpen && <div id="mobile-navigation" className="mx-4 mt-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-card lg:hidden">{[['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one'], ['For teams', '#teams'], ['FAQ', '#faq'], ['Contact', '#contact']].map(([label, href]) => <a onClick={() => setMenuOpen(false)} key={label} href={href} className="block rounded-xl px-3 py-3 text-sm font-semibold hover:bg-slate-50">{label}</a>)}<a href="#join" onClick={() => setMenuOpen(false)} className="button-primary mt-3 justify-center">Join early access <ArrowRight size={15} /></a></div>}
+        {menuOpen && <nav id="mobile-navigation" aria-label="Mobile navigation" className="mx-4 mt-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-card lg:hidden">{[['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one'], ['For teams', '#teams'], ['FAQ', '#faq'], ['Contact', '#contact']].map(([label, href]) => <a onClick={() => setMenuOpen(false)} key={label} href={href} className="block rounded-xl px-3 py-3 text-sm font-semibold hover:bg-slate-50">{label}</a>)}<a href="#join" onClick={() => { setMenuOpen(false); trackCta('join_early_access', 'mobile_navigation') }} className="button-primary mt-3 justify-center">Join early access <ArrowRight size={15} /></a></nav>}
       </header>
 
-      <main>
+      <main id="main-content">
         <section className="hero-stage relative flex min-h-[100svh] items-center px-4 pb-20 pt-28 sm:pb-24 sm:pt-32">
           <div className="page-wrap relative z-10">
             <div className="reveal text-left">
@@ -675,7 +684,7 @@ function App() {
               <div className="reveal lg:sticky lg:top-32 lg:self-start">
                 <h2 className="section-title mt-6">From ambition<br />to <span className="journey-heading-accent">momentum.</span></h2>
                 <p className="section-copy mt-5">Career growth is not a transaction. It is a connected loop that gets stronger with better context, clearer signals, and the right relationships.</p>
-                <a href="#join" className="journey-cta mt-8"><span>Start your journey</span><span className="journey-cta-arrow" aria-hidden="true"><ArrowRight size={16} /></span></a>
+                <a href="#join" onClick={() => trackCta('start_your_journey', 'how_it_works')} className="journey-cta mt-8"><span>Start your journey</span><span className="journey-cta-arrow" aria-hidden="true"><ArrowRight size={16} /></span></a>
               </div>
               <div className="journey-stack relative">
                 <div className="journey-rail" aria-hidden="true" />
@@ -721,14 +730,17 @@ function App() {
                     type="button"
                     aria-expanded={isOpen}
                     aria-controls={`faq-answer-${index}`}
-                    onClick={() => setOpenFaq(isOpen ? -1 : index)}
+                    onClick={() => {
+                      setOpenFaq(isOpen ? -1 : index)
+                      trackEvent('faq_toggle', { faq_index: index + 1, action: isOpen ? 'close' : 'open' })
+                    }}
                     className="faq-trigger"
                   >
                     <span className="faq-index">0{index + 1}</span>
                     <span className="faq-question">{faq.q}</span>
                     <span className="faq-toggle" aria-hidden="true"><ChevronDown size={16} /></span>
                   </button>
-                  <div id={`faq-answer-${index}`} className={`faq-answer ${isOpen ? 'is-open' : ''}`}>
+                  <div id={`faq-answer-${index}`} aria-hidden={!isOpen} className={`faq-answer ${isOpen ? 'is-open' : ''}`}>
                     <div><p>{faq.a}</p></div>
                   </div>
                 </article>
@@ -744,7 +756,7 @@ function App() {
               <h2 className="contact-title"><span>Contact</span> us</h2>
               <p className="contact-copy">Whether you’re growing your career, building a talent team, or supporting a developer community, we’d love to hear what’s on your mind.</p>
               <div className="contact-details">
-                <a href="mailto:hello@ygrow.org" className="contact-detail">
+                <a href="mailto:hello@ygrow.org" onClick={() => trackEvent('contact_link_click', { link_type: 'email', link_location: 'contact_section' })} className="contact-detail">
                   <span><Mail size={18} /></span>
                   <div><small>Email us</small><strong>hello@ygrow.org</strong></div>
                 </a>
@@ -776,7 +788,7 @@ function App() {
             { label: 'Telegram', href: 'https://t.me/ygrow', icon: Send },
             { label: 'Discord', href: 'https://discord.gg/ygrow', icon: DiscordIcon },
             { label: 'GitHub', href: 'https://github.com/ygrow', icon: Github },
-          ].map(({ label, href, icon: Icon }) => <a key={label} href={href} target="_blank" rel="noreferrer" className="footer-social-link" aria-label={label} title={label}><Icon size={17} /></a>)}</nav></div>
+          ].map(({ label, href, icon: Icon }) => <a key={label} href={href} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('social_click', { social_platform: label.toLowerCase(), link_location: 'footer' })} className="footer-social-link" aria-label={`${label} (opens in a new tab)`} title={label}><Icon size={17} /></a>)}</nav></div>
         </div>
       </footer>
     </div>
