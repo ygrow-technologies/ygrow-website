@@ -1,42 +1,56 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 
-type HeroAnimation = 'slide' | 'flicker' | 'focus' | 'type' | 'split'
+type HeroAnimation = 'route' | 'slide' | 'flicker' | 'focus' | 'type' | 'split'
+type HeroAccent = 'teal' | 'coral' | 'blue' | 'white'
 
 type HeroTopic = {
   lines: [string, string]
   animation: HeroAnimation
+  accent: HeroAccent
   description: string
   copyDelay: number
 }
 
 const heroTopics: HeroTopic[] = [
   {
+    lines: ['WE HELP', 'YOU GROW'],
+    animation: 'route',
+    accent: 'teal',
+    description: 'YGrow connects your story, opportunities, and community so every next step helps you become who you want to be.',
+    copyDelay: 900,
+  },
+  {
     lines: ['GROW', 'TOGETHER'],
     animation: 'slide',
+    accent: 'coral',
     description: 'Build your professional identity, discover better opportunities, and move forward with the right people and YGrow One beside you.',
     copyDelay: 950,
   },
   {
     lines: ['BUILD', 'YOUR STORY'],
     animation: 'flicker',
+    accent: 'blue',
     description: 'Turn projects, skills, decisions, and goals into a living career story that grows more useful with every chapter.',
     copyDelay: 1150,
   },
   {
     lines: ['FIND', 'YOUR FIT'],
     animation: 'focus',
+    accent: 'white',
     description: 'Discover roles, people, and companies aligned with your experience - not just the keywords on a resume.',
     copyDelay: 1050,
   },
   {
     lines: ['MOVE', 'FORWARD'],
     animation: 'type',
+    accent: 'teal',
     description: 'Keep opportunities, conversations, interviews, and next steps connected so your career momentum never gets lost.',
     copyDelay: 1400,
   },
   {
     lines: ['RISE', 'TOGETHER'],
     animation: 'split',
+    accent: 'coral',
     description: 'Learn from every move, support the people around you, and turn shared context into lasting career growth.',
     copyDelay: 1050,
   },
@@ -44,9 +58,23 @@ const heroTopics: HeroTopic[] = [
 
 type CircleTone = 'navy' | 'coral' | 'teal' | 'blue' | 'white'
 type HeroCircle = [CircleTone, number, number, number, number, number, number, number, number]
+type HeroRoute = { paths: number[][] }
 
 // tone, x, y, size, delay, entry x/y, idle x/y. The array order is the visual story.
 const heroScenes: HeroCircle[][] = [
+  // We help you grow: a Y-shaped network aligns and branches upward.
+  [
+    ['navy', 43, 77, 14, 0, 0, 125, -1, 3],
+    ['blue', 44, 62, 12, 150, 0, 105, 2, 2],
+    ['teal', 42, 43, 16, 320, 0, 85, -1, 1],
+    ['coral', 31, 31, 11, 500, 65, 58, -2, -2],
+    ['white', 18, 16, 14, 680, 135, 105, -3, -3],
+    ['blue', 58, 31, 11, 520, -65, 58, 2, -2],
+    ['teal', 70, 15, 15, 700, -135, 105, 3, -3],
+    ['white', 39, 56, 7, 860, 25, 75, -2, 2],
+    ['coral', 40, 24, 8, 1020, 38, 70, -2, -3],
+    ['navy', 57, 18, 9, 1180, -55, 85, 2, -3],
+  ],
   // Grow together: one shared center expands into a wider network.
   [
     ['teal', 41, 41, 18, 0, 0, 0, 2, -3],
@@ -119,6 +147,51 @@ const heroScenes: HeroCircle[][] = [
   ],
 ]
 
+const heroRoutes: HeroRoute[] = [
+  {
+    paths: [[0, 1, 2, 3, 4], [2, 5, 6]],
+  },
+  {
+    paths: [[0, 1, 5, 11], [0, 2, 7, 10], [0, 3, 8], [0, 4, 9], [0, 6]],
+  },
+  {
+    paths: [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]],
+  },
+  {
+    paths: [[0, 6, 9], [1, 3, 9], [2, 6, 8, 9], [5, 7, 9]],
+  },
+  {
+    paths: [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]],
+  },
+  {
+    paths: [[0, 2, 5, 8, 10], [1, 3, 6, 8, 10], [4, 7, 9, 10]],
+  },
+]
+
+function getCircleCenter(scene: HeroCircle[], index: number) {
+  const [, x, y, size] = scene[index]
+  return { x: x + size / 2, y: y + size / 2, radius: size / 2 }
+}
+
+function buildRoutePath(scene: HeroCircle[], indexes: number[]) {
+  const points = indexes.map((index) => getCircleCenter(scene, index))
+  if (points.length < 2) return ''
+
+  const trimPoint = (point: typeof points[number], neighbor: typeof points[number], distance: number) => {
+    const dx = neighbor.x - point.x
+    const dy = neighbor.y - point.y
+    const length = Math.hypot(dx, dy) || 1
+    return { x: point.x + (dx / length) * distance, y: point.y + (dy / length) * distance }
+  }
+
+  const first = trimPoint(points[0], points[1], points[0].radius + 1)
+  const lastIndex = points.length - 1
+  const last = trimPoint(points[lastIndex], points[lastIndex - 1], points[lastIndex].radius + 1)
+  const routePoints = [first, ...points.slice(1, -1), last]
+
+  return routePoints.map(({ x, y }, index) => `${index ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`).join(' ')
+}
+
 function AnimatedTitle({ topic }: { topic: HeroTopic }) {
   if (topic.animation === 'type') {
     return <>{topic.lines.map((line, lineIndex) => {
@@ -155,10 +228,10 @@ function TypedCopy({ text, delay }: { text: string; delay: number }) {
 
       const typedCharacter = text[characterIndex - 1]
       const typingDelay = typedCharacter === ' '
-        ? 105
+        ? 88
         : /[,.!?;:]/.test(typedCharacter)
-          ? 190
-          : 28 + (characterIndex % 4) * 5
+          ? 158
+          : 23 + (characterIndex % 4) * 4
 
       timeoutId = window.setTimeout(revealNextCharacter, typingDelay)
     }
@@ -179,10 +252,54 @@ function TypedCopy({ text, delay }: { text: string; delay: number }) {
 }
 
 function HeroKineticScene({ activeTopic }: { activeTopic: number }) {
+  const scene = heroScenes[activeTopic]
+  const route = heroRoutes[activeTopic]
+  const routeNodeIndexes = Array.from(new Set(route.paths.flat()))
+
   return (
     <div className="hero-kinetic-wrap" aria-hidden="true">
       <div key={activeTopic} className={`hero-kinetic-scene hero-kinetic-scene-${activeTopic + 1}`}>
-        {heroScenes[activeTopic].map(([tone, x, y, size, delay, enterX, enterY, floatX, floatY], index) => (
+        <svg className="hero-route-map" viewBox="0 0 100 100" preserveAspectRatio="none">
+          {route.paths.flatMap((indexes, pathIndex) => indexes.slice(1).map((targetIndex, segmentIndex) => {
+            const sourceIndex = indexes[segmentIndex]
+            const path = buildRoutePath(scene, [sourceIndex, targetIndex])
+            const targetDelay = Math.round(scene[targetIndex][4] * 1.35)
+            const toneIndex = (pathIndex % 3) + 1
+            return <g key={`${pathIndex}-${sourceIndex}-${targetIndex}`} className={`hero-route hero-route-tone-${toneIndex}`} style={{ '--route-delay': `${targetDelay}ms`, '--route-duration': '480ms' } as CSSProperties}>
+              <path className="hero-route-base" d={path} pathLength="1" />
+              <path className="hero-route-signal" d={path} pathLength="1" />
+            </g>
+          }))}
+          {routeNodeIndexes.map((circleIndex) => {
+            const { x, y } = getCircleCenter(scene, circleIndex)
+            const nodeDelay = Math.round(scene[circleIndex][4] * 1.35)
+            return <circle key={circleIndex} className="hero-route-node" cx={x} cy={y} r=".72" style={{ '--node-delay': `${nodeDelay}ms` } as CSSProperties} />
+          })}
+        </svg>
+        {scene.map(([tone, , , size, delay], index) => {
+          const { x, y, radius } = getCircleCenter(scene, index)
+          const angle = ((index * 137.5 + activeTopic * 31) % 360) * (Math.PI / 180)
+          const distance = radius + 2.2 + (index % 3) * .75
+          const ambientX = Math.min(98, Math.max(2, x + Math.cos(angle) * distance))
+          const ambientY = Math.min(98, Math.max(2, y + Math.sin(angle) * distance))
+
+          return (
+            <span
+              key={`ambient-${activeTopic}-${index}`}
+              className={`hero-ambient-slot hero-ambient-${tone}`}
+              style={{
+                left: `${ambientX}%`,
+                top: `${ambientY}%`,
+                width: `${Math.min(1.7, Math.max(.8, size * .13))}%`,
+                '--ambient-delay': `${Math.round(delay * 1.35) + 160}ms`,
+                '--ambient-duration': `${2800 + (index % 4) * 360}ms`,
+                '--ambient-float-x': `${Math.cos(angle + 1.2) * (4 + index % 3)}px`,
+                '--ambient-float-y': `${Math.sin(angle + 1.2) * (4 + index % 3)}px`,
+              } as CSSProperties}
+            />
+          )
+        })}
+        {scene.map(([tone, x, y, size, delay, enterX, enterY, floatX, floatY], index) => (
           <span
             key={`${activeTopic}-${index}`}
             className="hero-circle-slot"
@@ -203,7 +320,6 @@ function HeroKineticScene({ activeTopic }: { activeTopic: number }) {
           </span>
         ))}
       </div>
-      <span className="hero-scene-label">0{activeTopic + 1} / 05</span>
     </div>
   )
 }
@@ -226,7 +342,7 @@ export default function HeroMessage({ children }: { children?: ReactNode }) {
         <div key={activeTopic} className="hero-message-cycle">
           <h1
             aria-label={topic.lines.join(' ')}
-            className={`hero-topic-heading hero-topic-${topic.animation} text-[clamp(3.3rem,6.5vw,6.6rem)] font-medium leading-[.88] tracking-[-.04em] text-white`}
+            className={`hero-topic-heading hero-topic-${topic.animation} hero-topic-accent-${topic.accent} text-[clamp(3.3rem,6.5vw,6.6rem)] font-medium leading-[.88] tracking-[-.04em] text-white`}
           >
             <AnimatedTitle topic={topic} />
           </h1>

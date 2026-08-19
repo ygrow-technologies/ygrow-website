@@ -1,4 +1,5 @@
 import { ClipboardList, RotateCw, Sparkles, Target, UserRound } from 'lucide-react'
+import logoMono from '../assets/logo-dark.png'
 
 const orbitItems = [
   { label: 'Profile', tone: 'coral', icon: UserRound, tilt: -14 },
@@ -34,7 +35,9 @@ export default function CareerOrbit({ active, progress }: CareerOrbitProps) {
           )
         })}
       </div>
-      <div className="career-orbit-core"><span>Y</span><small>CONNECTED</small></div>
+      <div className="career-orbit-core">
+        <img className="career-orbit-core-logo" src={logoMono} alt="" />
+      </div>
     </div>
   )
 }

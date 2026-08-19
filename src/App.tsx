@@ -1,4 +1,4 @@
-import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from 'react'
+import { FormEvent, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from 'react'
 import {
   ArrowRight,
   BarChart3,
@@ -6,12 +6,16 @@ import {
   Check,
   ChevronDown,
   CircleCheck,
+  Clock3,
   Code2,
   Command,
   Compass,
+  Github,
+  Mail,
   Menu,
   Network,
   Search,
+  Send,
   Sparkles,
   Target,
   Users,
@@ -107,9 +111,11 @@ const faqs = [
   },
 ]
 
+const contactTopics = ['Product question', 'Talent team', 'Community partnership', 'Press and media', 'Something else']
+
 function BrandMark({ light = false }: { light?: boolean }) {
   return (
-    <a href="#top" className="group flex items-center gap-2.5" aria-label="YGrow home">
+    <a href="#top" className="group flex items-center gap-0.5" aria-label="YGrow home">
       <img src={light ? logoLight : logoDark} alt="" aria-hidden="true" className="h-10 w-10 shrink-0 object-contain sm:h-11 sm:w-11" />
       <span className={`text-[1.35rem] font-extrabold tracking-[-0.05em] ${light ? 'text-white' : 'text-ink'}`}>
         Grow
@@ -118,7 +124,15 @@ function BrandMark({ light = false }: { light?: boolean }) {
   )
 }
 
-function BackgroundFlow({ dark = false, variant = 'platform' }: { dark?: boolean; variant?: 'platform' | 'journey' | 'one' | 'teams' | 'faq' }) {
+function DiscordIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20.32 4.37a19.8 19.8 0 0 0-4.89-1.52c-.21.38-.46.9-.63 1.31a18.3 18.3 0 0 0-5.6 0 13.4 13.4 0 0 0-.64-1.31 19.7 19.7 0 0 0-4.89 1.52C.58 9.09-.26 13.69.17 18.23a19.9 19.9 0 0 0 6 3.03c.48-.66.91-1.37 1.27-2.12a13 13 0 0 1-2-.96l.49-.38c3.86 1.79 8.05 1.79 11.86 0l.49.38c-.64.38-1.31.7-2 .96.36.75.78 1.46 1.27 2.12a19.8 19.8 0 0 0 6-3.03c.5-5.27-.86-9.83-3.23-13.86ZM8.02 15.45c-1.17 0-2.13-1.08-2.13-2.4s.94-2.4 2.13-2.4c1.2 0 2.15 1.09 2.13 2.4 0 1.32-.94 2.4-2.13 2.4Zm7.96 0c-1.17 0-2.13-1.08-2.13-2.4s.94-2.4 2.13-2.4c1.2 0 2.15 1.09 2.13 2.4 0 1.32-.93 2.4-2.13 2.4Z" />
+    </svg>
+  )
+}
+
+function BackgroundFlow({ dark = false, variant = 'platform' }: { dark?: boolean; variant?: 'platform' | 'journey' | 'one' | 'teams' | 'faq' | 'contact' }) {
   return (
     <div className={`background-flow background-flow-${variant} ${dark ? 'background-flow-dark' : ''}`} aria-hidden="true">
       <span className="background-orb background-orb-coral" />
@@ -359,18 +373,167 @@ function WaitlistForm() {
       setMessage(error?.code === '23505' ? "You're already on the list." : "You're on the list. We'll be in touch.")
       setEmail('')
     } catch {
-      setStatus('error'); setMessage('Signup is temporarily unavailable. Please email hello@ygrow.com.')
+      setStatus('error'); setMessage('Signup is temporarily unavailable. Please email hello@ygrow.org')
     }
   }
 
-  return <div>
+  return <div className="footer-waitlist">
     <form onSubmit={subscribe} className="flex max-w-xl flex-col gap-2 sm:flex-row" aria-busy={status === 'loading'}>
-      <label className="sr-only" htmlFor="email-hero">Work email</label>
-      <input id="email-hero" name="email" type="email" inputMode="email" autoComplete="email" required disabled={status === 'loading'} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" aria-describedby="waitlist-status" className="min-h-12 min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-5 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/15 disabled:cursor-wait disabled:opacity-70" />
+      <label className="sr-only" htmlFor="waitlist-email">Work email</label>
+      <input id="waitlist-email" name="email" type="email" inputMode="email" autoComplete="email" required disabled={status === 'loading'} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" aria-describedby="waitlist-status" className="min-h-12 min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-5 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/15 disabled:cursor-wait disabled:opacity-70" />
       <button type="submit" disabled={status === 'loading'} className="button-primary min-h-12 justify-center disabled:cursor-wait disabled:opacity-60">{status === 'loading' ? 'Joining…' : 'Join early access'} <ArrowRight size={16} /></button>
     </form>
     {message && <p id="waitlist-status" className={`mt-2 pl-3 text-xs ${status === 'success' ? 'text-brand-teal' : 'text-brand-coral'}`} role="status" aria-live="polite">{message}</p>}
   </div>
+}
+
+function ContactForm() {
+  const [topic, setTopic] = useState(contactTopics[0])
+  const [topicOpen, setTopicOpen] = useState(false)
+  const [activeTopic, setActiveTopic] = useState(0)
+  const topicRootRef = useRef<HTMLDivElement>(null)
+  const topicTriggerRef = useRef<HTMLButtonElement>(null)
+  const topicOptionRefs = useRef<Array<HTMLButtonElement | null>>([])
+
+  useEffect(() => {
+    const closeOnOutsidePress = (event: PointerEvent) => {
+      if (!topicRootRef.current?.contains(event.target as Node)) setTopicOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOnOutsidePress)
+    return () => document.removeEventListener('pointerdown', closeOnOutsidePress)
+  }, [])
+
+  useEffect(() => {
+    if (!topicOpen) return
+    const frame = window.requestAnimationFrame(() => topicOptionRefs.current[activeTopic]?.focus())
+    return () => window.cancelAnimationFrame(frame)
+  }, [activeTopic, topicOpen])
+
+  function openTopicMenu(index = contactTopics.indexOf(topic)) {
+    setActiveTopic(Math.max(index, 0))
+    setTopicOpen(true)
+  }
+
+  function closeTopicMenu(returnFocus = false) {
+    setTopicOpen(false)
+    if (returnFocus) window.requestAnimationFrame(() => topicTriggerRef.current?.focus())
+  }
+
+  function selectTopic(option: string) {
+    setTopic(option)
+    closeTopicMenu(true)
+  }
+
+  function handleTopicTriggerKeyDown(event: ReactKeyboardEvent<HTMLButtonElement>) {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      const selectedIndex = contactTopics.indexOf(topic)
+      openTopicMenu(event.key === 'ArrowDown' ? selectedIndex : Math.max(selectedIndex - 1, 0))
+    }
+  }
+
+  function handleTopicOptionKeyDown(event: ReactKeyboardEvent<HTMLButtonElement>, index: number) {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      closeTopicMenu(true)
+      return
+    }
+    if (event.key === 'Tab') {
+      setTopicOpen(false)
+      return
+    }
+    const keyTargets: Record<string, number> = {
+      ArrowDown: Math.min(index + 1, contactTopics.length - 1),
+      ArrowUp: Math.max(index - 1, 0),
+      Home: 0,
+      End: contactTopics.length - 1,
+    }
+    const nextIndex = keyTargets[event.key]
+    if (nextIndex === undefined) return
+    event.preventDefault()
+    setActiveTopic(nextIndex)
+  }
+
+  function prepareMessage(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const form = event.currentTarget
+    const data = new FormData(form)
+    const name = String(data.get('name') ?? '').trim()
+    const email = String(data.get('email') ?? '').trim()
+    const topic = String(data.get('topic') ?? '').trim()
+    const note = String(data.get('message') ?? '').trim()
+    const subject = encodeURIComponent(`YGrow ${topic} enquiry from ${name}`)
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\n${note}`)
+
+    window.location.href = `mailto:hello@ygrow.org?subject=${subject}&body=${body}`
+    form.reset()
+    setTopic(contactTopics[0])
+  }
+
+  return (
+    <form className="contact-form" onSubmit={prepareMessage}>
+      <div className="contact-form-heading">
+        <div>
+          <p>Start a conversation</p>
+          <h3>Tell us what you’re building.</h3>
+        </div>
+        <span aria-hidden="true"><Send size={20} /></span>
+      </div>
+      <div className="contact-form-grid">
+        <label className="contact-field">
+          <span>Your name</span>
+          <input name="name" type="text" autoComplete="name" placeholder="Alex Morgan" required />
+        </label>
+        <label className="contact-field">
+          <span>Email</span>
+          <input name="email" type="email" inputMode="email" autoComplete="email" placeholder="alex@gmail.com" required />
+        </label>
+      </div>
+      <div className="contact-field">
+        <span id="contact-topic-label">What can we help with?</span>
+        <div ref={topicRootRef} className="contact-combobox">
+          <input type="hidden" name="topic" value={topic} />
+          <button
+            ref={topicTriggerRef}
+            type="button"
+            className={`contact-select-trigger ${topicOpen ? 'is-open' : ''}`}
+            aria-haspopup="listbox"
+            aria-expanded={topicOpen}
+            aria-controls="contact-topic-options"
+            aria-labelledby="contact-topic-label contact-topic-value"
+            onClick={() => topicOpen ? closeTopicMenu() : openTopicMenu()}
+            onKeyDown={handleTopicTriggerKeyDown}
+          >
+            <span id="contact-topic-value">{topic}</span>
+            <ChevronDown size={17} aria-hidden="true" />
+          </button>
+          {topicOpen && <div id="contact-topic-options" className="contact-select-menu" role="listbox" aria-labelledby="contact-topic-label">
+            {contactTopics.map((option, index) => <button
+              key={option}
+              ref={(element) => { topicOptionRefs.current[index] = element }}
+              type="button"
+              role="option"
+              aria-selected={topic === option}
+              className={`contact-select-option ${topic === option ? 'is-selected' : ''}`}
+              onClick={() => selectTopic(option)}
+              onMouseEnter={() => setActiveTopic(index)}
+              onKeyDown={(event) => handleTopicOptionKeyDown(event, index)}
+            >
+              <span>{option}</span>
+              {topic === option && <Check size={15} aria-hidden="true" />}
+            </button>)}
+          </div>}
+        </div>
+      </div>
+      <label className="contact-field">
+        <span>Your message</span>
+        <textarea name="message" rows={5} placeholder="Share a little context so we can connect you with the right person." required />
+      </label>
+      <div className="contact-form-actions">
+        <button type="submit" className="button-primary">Send message <ArrowRight size={16} /></button>
+      </div>
+    </form>
+  )
 }
 
 function App() {
@@ -443,22 +606,19 @@ function App() {
         <div className="page-wrap flex items-center justify-between">
           <BrandMark light={!scrolled} />
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary navigation">
-            {[['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one'], ['For teams', '#teams'], ['FAQ', '#faq']].map(([label, href]) => <a key={label} href={href} className={`text-sm font-semibold transition ${scrolled ? 'text-slate-600 hover:text-ink' : 'text-white/75 hover:text-white'}`}>{label}</a>)}
+            {[['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one'], ['For teams', '#teams'], ['FAQ', '#faq'], ['Contact', '#contact']].map(([label, href]) => <a key={label} href={href} className={`text-sm font-semibold transition ${scrolled ? 'text-slate-600 hover:text-ink' : 'text-white/75 hover:text-white'}`}>{label}</a>)}
           </nav>
           <div className="hidden items-center lg:flex"><a href="#join" className={`button-primary ${scrolled ? '' : 'button-primary-on-dark'}`}>Join YGrow <ArrowRight size={15} /></a></div>
           <button type="button" onClick={() => setMenuOpen(!menuOpen)} className={`grid h-10 w-10 place-items-center rounded-full border transition lg:hidden ${scrolled ? 'border-slate-200 text-ink' : 'border-white/25 text-white'}`} aria-label="Toggle navigation" aria-expanded={menuOpen} aria-controls="mobile-navigation">{menuOpen ? <X size={18} /> : <Menu size={19} />}</button>
         </div>
-        {menuOpen && <div id="mobile-navigation" className="mx-4 mt-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-card lg:hidden">{[['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one'], ['For teams', '#teams'], ['FAQ', '#faq']].map(([label, href]) => <a onClick={() => setMenuOpen(false)} key={label} href={href} className="block rounded-xl px-3 py-3 text-sm font-semibold hover:bg-slate-50">{label}</a>)}<a href="#join" onClick={() => setMenuOpen(false)} className="button-primary mt-3 justify-center">Join early access <ArrowRight size={15} /></a></div>}
+        {menuOpen && <div id="mobile-navigation" className="mx-4 mt-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-card lg:hidden">{[['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one'], ['For teams', '#teams'], ['FAQ', '#faq'], ['Contact', '#contact']].map(([label, href]) => <a onClick={() => setMenuOpen(false)} key={label} href={href} className="block rounded-xl px-3 py-3 text-sm font-semibold hover:bg-slate-50">{label}</a>)}<a href="#join" onClick={() => setMenuOpen(false)} className="button-primary mt-3 justify-center">Join early access <ArrowRight size={15} /></a></div>}
       </header>
 
       <main>
         <section className="hero-stage relative flex min-h-[100svh] items-center px-4 pb-20 pt-28 sm:pb-24 sm:pt-32">
           <div className="page-wrap relative z-10">
             <div className="reveal text-left">
-              <HeroMessage>
-                <div id="join" className="mt-10 max-w-xl"><WaitlistForm /></div>
-                <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-white/65"><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> Free to join</span><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> Built developer-first</span><span className="flex items-center gap-1.5"><Check size={13} className="text-white/80" /> You stay in control</span></div>
-              </HeroMessage>
+              <HeroMessage />
             </div>
           </div>
         </section>
@@ -522,7 +682,7 @@ function App() {
                 {journey.map((item, index) => <div key={item.number} style={{ transitionDelay: `${index * 80}ms` }} className="reveal journey-card-wrap">
                   <article className={`journey-card journey-card-${index + 1}`}>
                     <span className="journey-number"><span>{item.number}</span></span>
-                    <div className="relative z-10"><div className="mb-3 flex items-center gap-3"><h3 className="text-xl font-semibold text-ink">{item.title}</h3>{index === 3 && <Sparkles size={16} className="text-brand-coral" />}</div><p className="max-w-xl text-sm leading-6 text-slate-500 sm:text-base sm:leading-7">{item.copy}</p></div>
+                    <div className="relative z-10"><div className="mb-3 flex items-center gap-3"><h3 className="text-xl font-semibold text-ink">{item.title}</h3></div><p className="max-w-xl text-sm leading-6 text-slate-500 sm:text-base sm:leading-7">{item.copy}</p></div>
                   </article>
                 </div>)}
               </div>
@@ -540,25 +700,23 @@ function App() {
 
         <section id="teams" className="flow-section flow-section-teams section-space">
           <BackgroundFlow variant="teams" />
-          <div className="page-wrap relative z-10"><div className="reveal section-heading"><h2>A stronger network creates<br />better opportunities.</h2><p>YGrow is designed to make every side of the developer career ecosystem more human, relevant, and connected.</p></div><div className="mt-14 grid gap-5 md:grid-cols-3">{[
+          <div className="page-wrap relative z-10"><div className="reveal section-heading"><h2>A stronger network creates<br /><span className="text-brand-coral">better opportunities.</span></h2><p>YGrow is designed to make every side of the developer career ecosystem more human, relevant, and connected.</p></div><div className="mt-14 grid gap-5 md:grid-cols-3">{[
             { icon: Code2, tag: 'For developers', title: 'Build a career, not just a job search.', copy: 'Create a richer professional identity, connect with people who matter, and navigate each opportunity with clarity.', points: ['Career profile', 'Network & referrals', 'Opportunity workspace'] },
             { icon: Search, tag: 'For talent teams', title: 'Discover context beyond keywords.', copy: 'Understand the developer behind the résumé and build stronger candidate relationships from the first conversation.', points: ['Developer discovery', 'Context-rich matching', 'Connected outreach'] },
             { icon: Network, tag: 'For communities', title: 'Turn support into shared momentum.', copy: 'Help members move from learning to opportunity with better profiles, mentorship, and professional connections.', points: ['Member growth', 'Mentorship pathways', 'Career intelligence'] },
-          ].map((card, i) => { const Icon = card.icon; return <article key={card.tag} style={{ transitionDelay: `${i * 100}ms` }} className={`reveal group rounded-[18px] border p-8 transition duration-300 hover:-translate-y-1 ${i === 1 ? 'border-brand-navy bg-ink text-white' : 'border-brand-blue/10 bg-white'}`}><span className={`grid h-12 w-12 place-items-center rounded-lg ${i === 1 ? 'bg-brand-teal/15 text-brand-teal' : i === 0 ? 'bg-brand-blue/10 text-brand-blue' : 'bg-brand-coral/10 text-brand-coral'}`}><Icon size={21} /></span><p className={`mt-8 text-[10px] font-semibold uppercase tracking-[.17em] ${i === 1 ? 'text-brand-teal' : i === 0 ? 'text-brand-blue' : 'text-brand-coral'}`}>{card.tag}</p><h3 className="mt-3 text-2xl font-medium leading-tight">{card.title}</h3><p className={`mt-4 text-sm leading-6 ${i === 1 ? 'text-slate-300' : 'text-slate-500'}`}>{card.copy}</p><div className={`my-7 h-px ${i === 1 ? 'bg-white/10' : 'bg-brand-blue/10'}`} />{card.points.map(point => <p key={point} className="mb-3 flex items-center gap-2 text-sm font-medium"><Check size={14} className={i === 1 ? 'text-brand-teal' : i === 0 ? 'text-brand-blue' : 'text-brand-coral'} />{point}</p>)}</article> })}</div></div>
+          ].map((card, i) => { const Icon = card.icon; return <div key={card.tag} style={{ transitionDelay: `${i * 100}ms` }} className="reveal"><article className={`group h-full rounded-[18px] border p-8 transition duration-300 ease-out hover:-translate-y-2 hover:shadow-xl motion-reduce:hover:transform-none ${i === 1 ? 'border-brand-navy bg-ink text-white hover:rotate-[.65deg]' : 'border-brand-blue/10 bg-white hover:-rotate-[.65deg]'}`}><span className={`grid h-12 w-12 place-items-center rounded-lg ${i === 1 ? 'bg-brand-teal/15 text-brand-teal' : i === 0 ? 'bg-brand-blue/10 text-brand-blue' : 'bg-brand-coral/10 text-brand-coral'}`}><Icon size={21} /></span><p className={`mt-8 text-[10px] font-semibold uppercase tracking-[.17em] ${i === 1 ? 'text-brand-teal' : i === 0 ? 'text-brand-blue' : 'text-brand-coral'}`}>{card.tag}</p><h3 className="mt-3 text-2xl font-medium leading-tight">{card.title}</h3><p className={`mt-4 text-sm leading-6 ${i === 1 ? 'text-slate-300' : 'text-slate-500'}`}>{card.copy}</p><div className={`my-7 h-px ${i === 1 ? 'bg-white/10' : 'bg-brand-blue/10'}`} />{card.points.map(point => <p key={point} className="mb-3 flex items-center gap-2 text-sm font-medium"><Check size={14} className={i === 1 ? 'text-brand-teal' : i === 0 ? 'text-brand-blue' : 'text-brand-coral'} />{point}</p>)}</article></div> })}</div></div>
         </section>
 
         <section id="faq" className="flow-section flow-section-faq section-space">
-          <BackgroundFlow variant="faq" />
           <div className="page-wrap relative z-10 grid gap-14 lg:grid-cols-[.72fr_1.28fr] lg:gap-24">
             <div className="reveal">
-              <h2 className="section-title mt-6">Good to <span className="text-brand-blue">know.</span></h2>
-              <p className="section-copy mt-5">Quick context for the most common questions. Have something else in mind? Reach us at <a className="font-semibold text-brand-blue underline decoration-brand-blue/35 underline-offset-4" href="mailto:hello@ygrow.com">hello@ygrow.com</a>.</p>
-              <div className="faq-signal-rail" aria-hidden="true"><span /><i /><i /><i /><i /></div>
+              <h2 className="section-title mt-6">Good to <span className="text-brand-teal">know.</span></h2>
+              <p className="section-copy mt-5">Quick context for the most common questions. Have something else in mind? Reach us at <a className="font-semibold text-brand-teal underline decoration-brand-teal/35 underline-offset-4" href="mailto:hello@ygrow.org">hello@ygrow.org</a>.</p>
             </div>
             <div className="faq-list reveal reveal-right">
               {faqs.map((faq, index) => {
                 const isOpen = openFaq === index
-                return <article key={faq.q} className={`faq-item faq-tone-${(index % 4) + 1} ${isOpen ? 'is-open' : ''}`} style={{ animationDelay: `${140 + index * 85}ms` }}>
+                return <article key={faq.q} className={`faq-item ${isOpen ? 'is-open' : ''}`} style={{ animationDelay: `${100 + index * 65}ms` }}>
                   <button
                     type="button"
                     aria-expanded={isOpen}
@@ -578,19 +736,47 @@ function App() {
             </div>
           </div>
         </section>
+
+        <section id="contact" className="contact-section section-space">
+          <BackgroundFlow variant="contact" />
+          <div className="page-wrap relative z-10 grid items-center gap-14 lg:grid-cols-[.8fr_1.2fr] lg:gap-24">
+            <div className="reveal">
+              <h2 className="contact-title"><span>Contact</span> us</h2>
+              <p className="contact-copy">Whether you’re growing your career, building a talent team, or supporting a developer community, we’d love to hear what’s on your mind.</p>
+              <div className="contact-details">
+                <a href="mailto:hello@ygrow.org" className="contact-detail">
+                  <span><Mail size={18} /></span>
+                  <div><small>Email us</small><strong>hello@ygrow.org</strong></div>
+                </a>
+                <div className="contact-detail">
+                  <span><Clock3 size={18} /></span>
+                  <div><small>Response time</small><strong>Within 1–2 business days</strong></div>
+                </div>
+              </div>
+            </div>
+            <div className="reveal reveal-right reveal-delay-1"><ContactForm /></div>
+          </div>
+        </section>
       </main>
 
       <footer className="site-footer bg-ink px-4 pb-8 pt-16 text-white sm:px-6">
         <div className="page-wrap">
-          <div className="grid gap-12 border-b border-white/10 pb-12 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
+          <div className="grid gap-12 border-b border-white/10 pb-12 lg:grid-cols-[1.2fr_.7fr_.7fr_1.4fr]">
             <div><BrandMark light /><p className="mt-5 max-w-xs text-sm leading-6 text-slate-400">A connected career network helping developers build their identity, network, opportunities, and momentum.</p><p className="mt-5 text-xs font-bold uppercase tracking-[.17em] text-brand-teal">Why grow alone?</p></div>
             {[
               { title: 'Explore', links: [['Platform', '#platform'], ['How it works', '#journey'], ['YGrow One', '#one']] },
-              { title: 'Learn', links: [['For teams', '#teams'], ['Good to know', '#faq'], ['Email us', 'mailto:hello@ygrow.com']] },
-              { title: 'Early access', links: [['Subscribe', '#join']] },
+              { title: 'Learn', links: [['For teams', '#teams'], ['Good to know', '#faq'], ['Contact us', '#contact']] },
             ].map((group) => <nav key={group.title} aria-label={`${group.title} links`}><p className="mb-4 text-xs font-bold uppercase tracking-[.16em] text-slate-500">{group.title}</p>{group.links.map(([label, href]) => <a key={label} href={href} className="mb-3 block text-sm text-slate-300 transition hover:text-white">{label}</a>)}</nav>)}
+            <section id="join" className="footer-early-access" aria-labelledby="footer-early-access-title">
+              <p id="footer-early-access-title" className="mb-4 text-xs font-bold uppercase tracking-[.16em] text-slate-500">Early access</p>
+              <WaitlistForm />
+            </section>
           </div>
-          <div className="flex flex-col gap-4 pt-7 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"><p>© 2026 YGrow. Built for developers who keep growing.</p><div className="flex gap-5"><a href="mailto:hello@ygrow.com" className="hover:text-white">Contact</a><a href="#top" className="hover:text-white">Back to top</a></div></div>
+          <div className="flex flex-col gap-4 pt-7 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"><p>© 2026 YGrow. Built for developers who keep growing.</p><nav className="footer-socials" aria-label="YGrow social links">{[
+            { label: 'Telegram', href: 'https://t.me/ygrow', icon: Send },
+            { label: 'Discord', href: 'https://discord.gg/ygrow', icon: DiscordIcon },
+            { label: 'GitHub', href: 'https://github.com/ygrow', icon: Github },
+          ].map(({ label, href, icon: Icon }) => <a key={label} href={href} target="_blank" rel="noreferrer" className="footer-social-link" aria-label={label} title={label}><Icon size={17} /></a>)}</nav></div>
         </div>
       </footer>
     </div>
